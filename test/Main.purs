@@ -9,10 +9,8 @@ import Control.Monad.Aff (Aff, attempt, apathize, runAff, liftEff')
 import Control.Monad.Aff.Console (log)
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Exception (throw, message, stack, error)
-import Control.Monad.Eff.Ref (REF)
 import Control.Monad.Error.Class (throwError)
 import Control.Monad.Reader.Trans (runReaderT)
-import DOM (DOM)
 import Data.Either (Either(..), either)
 import Data.Foldable (traverse_)
 import Data.Maybe (fromMaybe, Maybe(..))
@@ -20,26 +18,16 @@ import Selenium (quit)
 import Selenium.Browser (Browser(..), browserCapabilities)
 import Selenium.Builder (withCapabilities, build)
 import Selenium.Monad (get, setWindowSize, byId, findElement, byClassName, getText, clickEl)
-import Selenium.Types (SELENIUM, Locator, Element)
-import Test.Feature (FeatureEffects, Feature)
+import Test.Feature (ConcreteFeature, ConcreteEffects, Config)
 import Test.Scenario (scenario)
 import Text.Chalky (green, red, yellow)
 import Data.Time.Duration (Milliseconds(..))
+import Test.Interaction (clickElement, getElementText)
 
 
 -- import CodeSaga.Server.Test (launchServer)
 -- import Control.Monad.Eff (Eff)
 
-type Config = { selenium ∷ {waitTime ∷ Milliseconds} }
-
-type ConcreteEffects = FeatureEffects
-  (   console ∷ Ec.CONSOLE
-    , dom ∷ DOM
-    , ref ∷ REF
-    , selenium ∷ SELENIUM
-  )
-
-type ConcreteFeature = Feature () (config ∷ Config)
 
 main ∷ Eff (ConcreteEffects) Unit
 main = do
@@ -101,26 +89,6 @@ expectChangeOnClick contentElement buttonElement = do
   clickElement buttonElement
   afterClick ← getElementText contentElement
   expectToNotEqual beforeClick afterClick
-
-  where clickElement ∷ String → ConcreteFeature Unit
-        clickElement className = do
-          element ← getElement className
-          clickEl element
-
-        getElementText ∷ String → ConcreteFeature String
-        getElementText className = do
-          element ← getElement className
-          getText element
-
-        getElement ∷ String → ConcreteFeature Element
-        getElement className = do
-          locator ← byClassName className
-          element ← findElement locator
-          handleMaybe element
-
-          where handleMaybe ∷ Maybe Element → ConcreteFeature Element
-                handleMaybe (Just e) = pure e
-                handleMaybe Nothing = throwError $ error $ "Element with class: " ⊕ className ⊕ " is not present"
 
 expectElementPresent ∷ String → ConcreteFeature Unit
 expectElementPresent klass = byClassName klass >>= findElement >>= elementExists
