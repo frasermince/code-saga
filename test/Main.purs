@@ -22,7 +22,7 @@ import Test.Feature (ConcreteFeature, ConcreteEffects, Config)
 import Test.Scenario (scenario)
 import Text.Chalky (green, red, yellow)
 import Data.Time.Duration (Milliseconds(..))
-import Test.Interaction (clickElement, getElementText)
+import Test.Interaction (expectChangeOnClick)
 
 
 -- import CodeSaga.Server.Test (launchServer)
@@ -79,16 +79,6 @@ tests = do
   testScenario closeSite "Clicking Next Changes Contents" [] do
     expectChangeOnClick "presentation" "next"
 
-expectToNotEqual ∷ ∀ a. Show a ⇒ Eq a ⇒ a → a → ConcreteFeature Unit
-expectToNotEqual a b | a ≡ b     = throwError $ error $ "Expected " ⊕ (show a) ⊕ " but got " ⊕ (show b)
-                     | otherwise = pure unit
-
-expectChangeOnClick ∷ String → String → ConcreteFeature Unit
-expectChangeOnClick contentElement buttonElement = do
-  beforeClick ← getElementText contentElement
-  clickElement buttonElement
-  afterClick ← getElementText contentElement
-  expectToNotEqual beforeClick afterClick
 
 expectElementPresent ∷ String → ConcreteFeature Unit
 expectElementPresent klass = byClassName klass >>= findElement >>= elementExists

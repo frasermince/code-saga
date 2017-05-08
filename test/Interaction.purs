@@ -28,3 +28,15 @@ getElement className = do
     where handleMaybe ∷ Maybe Element → ConcreteFeature Element
           handleMaybe (Just e) = pure e
           handleMaybe Nothing = throwError $ error $ "Element with class: " ⊕ className ⊕ " is not present"
+
+expectChangeOnClick ∷ String → String → ConcreteFeature Unit
+expectChangeOnClick contentElement buttonElement = do
+  beforeClick ← getElementText contentElement
+  clickElement buttonElement
+  afterClick ← getElementText contentElement
+  expectToNotEqual beforeClick afterClick
+
+  
+expectToNotEqual ∷ ∀ a. Show a ⇒ Eq a ⇒ a → a → ConcreteFeature Unit
+expectToNotEqual a b | a ≡ b     = throwError $ error $ "Expected " ⊕ (show a) ⊕ " but got " ⊕ (show b)
+                     | otherwise = pure unit
