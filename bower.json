@@ -1,10 +1,10 @@
 {
-  "name": "pux-starter-app",
-  "homepage": "https://github.com/alexmingoia/pux-starter-app",
+  "name": "CodeSaga",
+  "homepage": "https://github.com/frasermince/code-saga",
   "authors": [
-    "Alex Mingoia <talk@alexmingoia.com>"
+    "Fraser Mince <frasermince@gmail.com>"
   ],
-  "description": "Starter Pux application using webpack with hot-reloading.",
+  "description": "Project for code presentations",
   "main": "support/entry.client.js",
   "license": "BSD3",
   "dependencies": {

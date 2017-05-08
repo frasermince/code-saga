@@ -44,7 +44,7 @@ After compiling the app should be available at `http://localhost:3000`.
 
 #### watch
 
-`npm start` or `npm run watch` will start a development server, which
+`npm start` or `npm run dev` will start a development server, which
 hot-reloads your application when sources changes.
 
 #### serve
