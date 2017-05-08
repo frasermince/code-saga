@@ -1,0 +1,3 @@
+[submodule "MultiplyMeApi"]
+	path = MultiplyMeApi
+	url = https://github.com/frasermince/MultiplyMeApi
