@@ -11,5 +11,5 @@ import Text.Smolder.HTML.Attributes (className, id)
 
 view ∷ State → HTML Event
 view s =
-  div ! id "first-slide" $ do
+  div ! className "presentation" $ do
     h1 $ text "Name"
