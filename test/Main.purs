@@ -72,7 +72,7 @@ runTests config = do
   either throwError (const $ pure unit) res
 
 openSite ∷ ConcreteFeature Unit
-openSite = get "https://localhost:3000"
+openSite = get "http://localhost:3000/presentation/project_name/1"
 
 closeSite ∷ ConcreteFeature Unit
 closeSite = pure unit
