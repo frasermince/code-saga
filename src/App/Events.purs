@@ -31,7 +31,7 @@ foldp (PreviousSlide ev) (State st) =
   onlyEffects (State st) [ do
     liftEff do
       preventDefault ev
-    pure $ navigateToSlideWith (sub 1) st.route ev
+    pure $ navigateToSlideWith (flip sub 1) st.route ev
   ]
 
 foldp (NextSlide ev) (State st) =

@@ -36,7 +36,7 @@ expectChangeOnClick contentElement buttonElement = do
   afterClick ← getElementText contentElement
   expectToNotEqual beforeClick afterClick
 
-  
+
 expectToNotEqual ∷ ∀ a. Show a ⇒ Eq a ⇒ a → a → ConcreteFeature Unit
-expectToNotEqual a b | a ≡ b     = throwError $ error $ "Expected " ⊕ (show a) ⊕ " but got " ⊕ (show b)
+expectToNotEqual a b | a ≡ b     = throwError $ error $ "Expected " ⊕ (show a) ⊕ " to not equal " ⊕ (show b)
                      | otherwise = pure unit

@@ -60,7 +60,7 @@ runTests config = do
   either throwError (const $ pure unit) res
 
 openSite ∷ ConcreteFeature Unit
-openSite = get "http://localhost:3000/presentation/project_name/1"
+openSite = get "http://localhost:3000/presentation/project_name/2"
 
 closeSite ∷ ConcreteFeature Unit
 closeSite = pure unit
@@ -78,6 +78,8 @@ tests = do
     expectElementPresent "presentation"
   testScenario closeSite "Clicking Next Changes Contents" [] do
     expectChangeOnClick "presentation" "next"
+  testScenario closeSite "Clicking Previous Changes Contents" [] do
+    expectChangeOnClick "presentation" "previous"
 
 
 expectElementPresent ∷ String → ConcreteFeature Unit
