@@ -12,7 +12,7 @@ import DOM.HTML.History (DocumentTitle(..), URL(..), pushState)
 import DOM.HTML.Types (HISTORY)
 import DOM.HTML.Window (history)
 import Data.Foreign (toForeign)
-import Data.Maybe (Maybe(..), maybe, isNothing)
+import Data.Maybe (Maybe(..), maybe, isNothing, isJust)
 import Network.HTTP.Affjax (AJAX)
 import Pux (EffModel, noEffects, onlyEffects)
 import Pux.DOM.Events (DOMEvent)
@@ -46,7 +46,7 @@ foldp (PreviousSlide ev) (State st) =
   onlyEffects (State st) [ do
     liftEff do
       preventDefault ev
-    pure $ navigateToSlideWith decrement st.route ev
+    pure $ navigateToSlideWith decrement (State st) ev
   ]
   where decrement = flip sub 1
 
@@ -54,7 +54,7 @@ foldp (NextSlide ev) (State st) =
   onlyEffects (State st) [ do
     liftEff do
       preventDefault ev
-    pure $ navigateToSlideWith increment st.route ev
+    pure $ navigateToSlideWith increment (State st) ev
   ]
   where increment = add 1
 
@@ -80,11 +80,14 @@ findSlide ∷ State → Int → Maybe SlideData
 findSlide (State st) number = index st.slides (number - 1)
 
 
-navigateToSlideWith ∷ (Int → Int) → Route → DOMEvent → Maybe Event
-navigateToSlideWith f route event = createNavigate ∘ toURL <$> changeSlideNumber route
+navigateToSlideWith ∷ (Int → Int) → State → DOMEvent → Maybe Event
+navigateToSlideWith f (State st) event = createNavigate ∘ toURL <$> changeSlideNumber st.route
   where createNavigate ∷ String → Event
         createNavigate = flip Navigate event
 
         changeSlideNumber ∷ Route → Maybe Route
-        changeSlideNumber (Slide projectName slideNumber) = Just $ Slide projectName $ f slideNumber
+        changeSlideNumber (Slide projectName slideNumber)
+          | isJust $ findSlide (State st) $ f slideNumber = Just $ Slide projectName $ f slideNumber
+          | otherwise                                     = Nothing
+
         changeSlideNumber _ = Nothing

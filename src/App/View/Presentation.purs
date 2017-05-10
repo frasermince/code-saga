@@ -26,7 +26,7 @@ import Data.Ring ((-))
 --         findSlide = index slides (number - 1)
 -- projectCode _ = notFound
 
-notFound = div #! onLoad (Navigate "/not_found") $ text "No presentation"
+notFound = div #! onLoad (Navigate "/not_found") $ text "No slide"
 
 view ∷ State → HTML Event
 view s =

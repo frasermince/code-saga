@@ -92,8 +92,15 @@ tests = do
   testScenario closeSite "Clicking Next On Last Slide Does Nothing" [] do
     clickElement "next"
     expectNoChangeOnClick "presentation" "next"
+  testScenario closeSite "Going To Invalid Url Should Redirect To Not Found" ["Currently does not work"] do
+    get "http://localhost:3000/presentation/project_name/5"
+    expectElementNotPresent "next"
 
 
+expectElementNotPresent ∷ String → ConcreteFeature Unit
+expectElementNotPresent klass = byClassName klass >>= findElement >>= elementExists
+  where elementExists (Just x) = throwError $ error $ "Element exists with class: " ⊕ klass
+        elementExists Nothing = pure unit
 
 expectElementPresent ∷ String → ConcreteFeature Unit
 expectElementPresent klass = byClassName klass >>= findElement >>= elementExists
