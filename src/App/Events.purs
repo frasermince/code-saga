@@ -12,7 +12,7 @@ import DOM.HTML.History (DocumentTitle(..), URL(..), pushState)
 import DOM.HTML.Types (HISTORY)
 import DOM.HTML.Window (history)
 import Data.Foreign (toForeign)
-import Data.Maybe (Maybe(..), maybe)
+import Data.Maybe (Maybe(..), maybe, isNothing)
 import Network.HTTP.Affjax (AJAX)
 import Pux (EffModel, noEffects, onlyEffects)
 import Pux.DOM.Events (DOMEvent)
@@ -24,18 +24,23 @@ data Event = PageView Route
            | PreviousSlide DOMEvent
            | NextSlide DOMEvent
            | Navigate String DOMEvent
-           | NavigateNotFound
 
 type AppEffects fx = (ajax :: AJAX, dom ∷ DOM, history ∷ HISTORY | fx)
 
 foldp :: ∀ fx. Event -> State -> EffModel State Event (AppEffects fx)
 foldp (PageView route) st =
-  onlyEffects appliedState $ [ do
-    liftEff do
-      pure unit
-    pure $ redirect $ appliedState
-  ]
-  where appliedState = newState route st
+  noEffects $ newState route st
+
+  where newState ∷ Route → State → State
+        newState route (State st) = case route of
+          Slide name number → makeState (State st) number route
+          _ → State st { route = route, loaded = true }
+
+        makeState ∷ State → Int → Route → State
+        makeState st number route = (slideState st route) $ _.fileName ∘ unwrap <$> findSlide st number
+
+        slideState ∷ State → Route → Maybe String → State
+        slideState (State st) route text = State st { route = route, loaded = true, currentSlideContent = wrap text }
 
 foldp (PreviousSlide ev) (State st) =
   onlyEffects (State st) [ do
@@ -59,40 +64,21 @@ foldp (Navigate url ev) state =
       preventDefault ev
       h <- history =<< window
       pushState (toForeign {}) (DocumentTitle "") (URL url) h
-    pure $ Just $ PageView (match url)
+    pure $ Just $ PageView $ redirect (match url) state
   ]
+  where redirect ∷ Route → State → Route
+        redirect route state | shouldRedirect route state = match "/not_found"
+                             | otherwise = route
 
-foldp NavigateNotFound state =
-  onlyEffects state [ do
-    liftEff do
-      h <- history =<< window
-      pushState (toForeign {}) (DocumentTitle "") (URL url) h
-    pure $ Just $ PageView (match url)
-  ]
-  where url = "/not_found"
+        shouldRedirect ∷ Route → State → Boolean
+        shouldRedirect (Slide _ number) state = isNothing $ findSlide state number
+        shouldRedirect _ _ = false
 
 
-newState ∷ Route → State → State
-newState route (State st) = case route of
-  Slide name number → makeState (State st) number route
-  _ → State st { route = route, loaded = true }
-
-makeState ∷ State → Int → Route → State
-makeState st number route = (slideState st route) $ _.fileName ∘ unwrap <$> findSlide st number
-
-slideState ∷ State → Route → Maybe String → State
-slideState (State st) route text = State st { route = route, loaded = true, currentSlideContent = wrap text }
 
 findSlide ∷ State → Int → Maybe SlideData
 findSlide (State st) number = index st.slides (number - 1)
 
-redirect ∷ State → Maybe Event
-redirect state | shouldRedirect state = Just $ NavigateNotFound
-               | otherwise = Nothing
-
-shouldRedirect ∷ State → Boolean
-shouldRedirect (State { route: Slide _ _, currentSlideContent: (NullOrUndefined Nothing) }) = true
-shouldRedirect _ = false
 
 navigateToSlideWith ∷ (Int → Int) → Route → DOMEvent → Maybe Event
 navigateToSlideWith f route event = createNavigate ∘ toURL <$> changeSlideNumber route
