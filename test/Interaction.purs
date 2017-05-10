@@ -29,14 +29,24 @@ getElement className = do
           handleMaybe (Just e) = pure e
           handleMaybe Nothing = throwError $ error $ "Element with class: " ⊕ className ⊕ " is not present"
 
+expectNoChangeOnClick ∷ String → String → ConcreteFeature Unit
+expectNoChangeOnClick = expectChangeOnFunction expectToEqual
 expectChangeOnClick ∷ String → String → ConcreteFeature Unit
-expectChangeOnClick contentElement buttonElement = do
+expectChangeOnClick = expectChangeOnFunction expectToNotEqual
+expectChangeOnFunction ∷ (String → String → ConcreteFeature Unit) → String → String → ConcreteFeature Unit
+expectChangeOnFunction f contentElement buttonElement = do
   beforeClick ← getElementText contentElement
   clickElement buttonElement
   afterClick ← getElementText contentElement
-  expectToNotEqual beforeClick afterClick
+  f beforeClick afterClick
 
+
+expectToEqual ∷ ∀ a. Show a ⇒ Eq a ⇒ a → a → ConcreteFeature Unit
+expectToEqual = expectCompare (≡)
 
 expectToNotEqual ∷ ∀ a. Show a ⇒ Eq a ⇒ a → a → ConcreteFeature Unit
-expectToNotEqual a b | a ≡ b     = throwError $ error $ "Expected " ⊕ (show a) ⊕ " to not equal " ⊕ (show b)
-                     | otherwise = pure unit
+expectToNotEqual = expectCompare (≢)
+
+expectCompare ∷ ∀ a. Show a ⇒ Eq a ⇒ (a → a → Boolean ) → a → a → ConcreteFeature Unit
+expectCompare f a b | f a b     = pure unit
+                    | otherwise = throwError $ error $ "Expected comparison of " ⊕ (show a) ⊕ " and " ⊕ (show b) ⊕ " to be true."

@@ -22,7 +22,7 @@ import Test.Feature (ConcreteFeature, ConcreteEffects, Config)
 import Test.Scenario (scenario)
 import Text.Chalky (green, red, yellow)
 import Data.Time.Duration (Milliseconds(..))
-import Test.Interaction (expectChangeOnClick)
+import Test.Interaction (expectChangeOnClick, expectNoChangeOnClick, clickElement, expectToEqual, getElementText)
 
 
 -- import CodeSaga.Server.Test (launchServer)
@@ -80,6 +80,19 @@ tests = do
     expectChangeOnClick "presentation" "next"
   testScenario closeSite "Clicking Previous Changes Contents" [] do
     expectChangeOnClick "presentation" "previous"
+  testScenario closeSite "Clicking Previous Then Next yields the same contents" [] do
+    beforeText ← getElementText "presentation"
+    clickElement "previous"
+    clickElement "next"
+    afterText ← getElementText "presentation"
+    expectToEqual beforeText afterText
+  testScenario closeSite "Clicking Previous On First Slide Does Nothing" [] do
+    clickElement "previous"
+    expectNoChangeOnClick "presentation" "previous"
+  testScenario closeSite "Clicking Next On Last Slide Does Nothing" [] do
+    clickElement "next"
+    expectNoChangeOnClick "presentation" "next"
+
 
 
 expectElementPresent ∷ String → ConcreteFeature Unit
