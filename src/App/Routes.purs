@@ -31,6 +31,8 @@ match url = fromMaybe (NotFound url) $ router url $
   Home <$ end
   <|>
   Slide <$> (lit "presentation" *> str) <*> int <* end
+  <|>
+  NotFound "/not_found" <$ lit "not_found" <* end
 
 
 toURL :: Route -> String
