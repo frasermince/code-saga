@@ -16,20 +16,21 @@ import Data.Newtype (unwrap)
 import App.Events (Event(..))
 import Data.Ring ((-))
 
-projectCode :: State -> HTML Event
-projectCode (State {slides: slides, route: (Slide name number)}) =
-  text $ fetchCodeFromFile
-  where fetchCodeFromFile = maybe "Not fuond" fetch getFileName
-        fetch fileName = fileName
-        getFileName ∷ Maybe String
-        getFileName = _.fileName ∘ unwrap <$> findSlide
-        findSlide ∷ Maybe SlideData
-        findSlide = index slides (number - 1)
-projectCode _ = div #! onLoad (Navigate "/not_found") $ text "No presentation"
+-- projectCode :: State → HTML Event
+-- projectCode (State {slides: slides, route: (Slide name number)}) =
+--   maybe notFound fetch getNameFromSlide
+--   where fetch fileName = text fileName
+--         getNameFromSlide ∷ Maybe String
+--         getNameFromSlide = _.fileName ∘ unwrap <$> findSlide
+--         findSlide ∷ Maybe SlideData
+--         findSlide = index slides (number - 1)
+-- projectCode _ = notFound
+
+notFound = div #! onLoad (Navigate "/not_found") $ text "No presentation"
 
 view ∷ State → HTML Event
 view s =
   div ! className "presentation" $ do
-    pre $ code $ projectCode s
+    pre $ code $ maybe notFound text (unwrap $ _.currentSlideContent $ unwrap $ s)
     button ! className "previous" #! onClick PreviousSlide $ text "previous"
     button ! className "next" #! onClick NextSlide  $ text "next"

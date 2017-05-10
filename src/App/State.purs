@@ -9,6 +9,9 @@ import Data.Newtype (class Newtype)
 import Data.Show (class Show)
 import Data.Foreign.Class (class Decode, class Encode)
 import Data.Foreign.Generic (genericEncode, genericDecode, defaultOptions)
+import Data.Maybe (Maybe(..))
+import Data.Foreign.NullOrUndefined (NullOrUndefined)
+import Data.Newtype (wrap)
 
 newtype SlideData = SlideData
   { fileName ∷ String
@@ -28,11 +31,11 @@ newtype State = State
   , route ∷ Route
   , loaded ∷ Boolean
   , slides ∷ Array SlideData
+  , currentSlideContent ∷ NullOrUndefined String
   }
 
-derive instance genericState :: Generic State _
-derive instance newtypeState :: Newtype State _
-
+derive instance genericState ∷ Generic State _
+derive instance newtypeState ∷ Newtype State _
 instance showState :: Show State where show = genericShow
 
 init :: String -> State
@@ -41,4 +44,5 @@ init url = State
   , route: match url
   , loaded: false
   , slides: [SlideData {fileName: "CODE FOR PRESENTATION 1", lineNumber: 1, annotation: "HI"}, SlideData {fileName: "CODE FOR PRESENTATION 2", lineNumber: 1, annotation: "HI"}, SlideData {fileName: "CODE FOR PRESENTATION 3", lineNumber: 1, annotation: "HI"}]
+  , currentSlideContent: wrap Nothing
   }
