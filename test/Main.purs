@@ -24,7 +24,7 @@ import Text.Chalky (green, red, yellow)
 import Data.Time.Duration (Milliseconds(..))
 import Test.Interaction (expectChangeOnClick, expectNoChangeOnClick, clickElement, expectToEqual, getElementText)
 import Server as Server
-import App.State (init)
+import App.State (init, defaultSlides)
 
 
 -- import CodeSaga.Server.Test (launchServer)
@@ -35,7 +35,7 @@ import App.State (init)
 main = do
   void $ runAff errHandler (const $ Process.exit 0) do
     log $ yellow "Starting tests"
-    _ ← liftEff' Server.testMain
+    _ ← liftEff' $ Server.testMain defaultSlides
     testResults ← attempt $ runTests $ {selenium: {waitTime: Milliseconds(60.0)}}
     case testResults of
       Left e → throwError e

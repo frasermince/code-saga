@@ -3,7 +3,7 @@ module Server where
 import Prelude
 import App.Events (AppEffects, Event(..), foldp)
 import App.Routes (Route(..), match)
-import App.State (State(..), init)
+import App.State (State(..), init, initWithSlides, SlideData(..))
 import App.View.HTMLWrapper (htmlWrapper)
 import App.View.Layout (view)
 import Control.IxMonad (ibind)
@@ -39,16 +39,17 @@ appHandler
   => Request req m
   => Response res m b
   => ResponseWritable b m String
-  => Middleware
+  => Array SlideData →
+     Middleware
      m
      (Conn req (res StatusLineOpen) c)
      (Conn req (res ResponseEnded) c)
      Unit
-appHandler = do
+appHandler slides = do
   request <- getRequestData
 
   app <- liftEff $ start
-    { initialState: init request.url
+    { initialState: initWithSlides request.url slides
     , view
     , foldp
     , inputs: [constant (PageView (match request.url))]
@@ -74,9 +75,9 @@ appHandler = do
 
 -- | Starts server (for development).
 main :: Eff (CoreEffects (AppEffects (buffer :: BUFFER, fs :: FS, http :: HTTP, console :: CONSOLE, process :: PROCESS))) Unit
-main = testMain
-testMain :: ∀ e. Eff (CoreEffects (AppEffects (buffer :: BUFFER, fs :: FS, http :: HTTP, console :: CONSOLE, process :: PROCESS | e))) Unit
-testMain = do
+main = testMain []
+testMain :: ∀ e. Array SlideData → Eff (CoreEffects (AppEffects (buffer :: BUFFER, fs :: FS, http :: HTTP, console :: CONSOLE, process :: PROCESS | e))) Unit
+testMain slides = do
   port <- (fromMaybe 0 <<< fromString <<< fromMaybe "3000") <$> lookupEnv "PORT"
-  let app = fileServer "static" appHandler
+  let app = fileServer "static" $ appHandler slides
   runServer (defaultOptionsWithLogging { port = Port port }) {} app

@@ -38,11 +38,23 @@ derive instance genericState ∷ Generic State _
 derive instance newtypeState ∷ Newtype State _
 instance showState :: Show State where show = genericShow
 
-init :: String -> State
-init url = State
+defaultSlides ∷ Array SlideData
+defaultSlides =
+  [
+    SlideData {fileName: "CODE FOR PRESENTATION 1", lineNumber: 1, annotation: "HI"}
+  , SlideData {fileName: "CODE FOR PRESENTATION 2", lineNumber: 1, annotation: "HI"}
+  , SlideData {fileName: "CODE FOR PRESENTATION 3", lineNumber: 1, annotation: "HI"}
+  ]
+
+initWithSlides ∷ String → Array SlideData → State
+initWithSlides url slides = State
   { title: config.title
   , route: match url
   , loaded: false
-  , slides: [SlideData {fileName: "CODE FOR PRESENTATION 1", lineNumber: 1, annotation: "HI"}, SlideData {fileName: "CODE FOR PRESENTATION 2", lineNumber: 1, annotation: "HI"}, SlideData {fileName: "CODE FOR PRESENTATION 3", lineNumber: 1, annotation: "HI"}]
+  , slides: slides
   , currentSlideContent: wrap Nothing
   }
+
+
+init :: String -> State
+init url = initWithSlides url defaultSlides
