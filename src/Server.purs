@@ -74,7 +74,9 @@ appHandler = do
 
 -- | Starts server (for development).
 main :: Eff (CoreEffects (AppEffects (buffer :: BUFFER, fs :: FS, http :: HTTP, console :: CONSOLE, process :: PROCESS))) Unit
-main = do
+main = testMain
+testMain :: ∀ e. Eff (CoreEffects (AppEffects (buffer :: BUFFER, fs :: FS, http :: HTTP, console :: CONSOLE, process :: PROCESS | e))) Unit
+testMain = do
   port <- (fromMaybe 0 <<< fromString <<< fromMaybe "3000") <$> lookupEnv "PORT"
   let app = fileServer "static" appHandler
   runServer (defaultOptionsWithLogging { port = Port port }) {} app

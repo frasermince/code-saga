@@ -35,7 +35,7 @@ import App.State (init)
 main = do
   void $ runAff errHandler (const $ Process.exit 0) do
     log $ yellow "Starting tests"
-    -- _ ← liftEff' Server.testMain
+    _ ← liftEff' Server.testMain
     testResults ← attempt $ runTests $ {selenium: {waitTime: Milliseconds(60.0)}}
     case testResults of
       Left e → throwError e

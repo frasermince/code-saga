@@ -19,6 +19,7 @@ const config = {
   output: {
     path: path.join(__dirname, 'static', 'dist'),
     filename: 'test.js',
+    publicPath: '/',
     libraryTarget: 'commonjs2'
   },
   module: {
@@ -28,8 +29,13 @@ const config = {
         loader: 'purs-loader',
         exclude: /node_modules/,
         query: {
-          bundle: true,
-          bundleOutput: 'static/dist/test.js'
+          psc: 'psa',
+          pscIde: true,
+          src: [
+            path.join('src', '**', '*.purs'),
+            path.join('bower_components', 'purescript-*', 'src', '**', '*.purs'),
+            path.join('test', '**', '*.purs'),
+          ]
         }
       }
     ],
@@ -75,13 +81,13 @@ if (require.main === module) {
 
     response = require('./static/dist/test.js');
     // console.log('response', response);
-    if (server && !stats.hasErrors()) {
-      server.kill('SIGKILL')
-      server = spawn('node', ['./dist/server.js']);
-    } else {
+    // if (server && !stats.hasErrors()) {
+      // server.kill('SIGKILL')
+      // server = spawn('node', ['./dist/server.js']);
+    // } else {
       // spawn('node', ['./static/dist/test.js']);
-      server = spawn('node', ['./dist/server.js']);
-    }
+      // server = spawn('node', ['./dist/server.js']);
+    // }
   })
 } else {
   module.exports = config
