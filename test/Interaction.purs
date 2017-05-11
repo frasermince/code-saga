@@ -9,31 +9,31 @@ import Data.Maybe                  (Maybe(..))
 import Control.Monad.Error.Class   (throwError)
 import Control.Monad.Eff.Exception (error)
 
-clickElement ∷ String → ConcreteFeature Unit
+clickElement ∷ ∀ e. String → ConcreteFeature e Unit
 clickElement className = do
   element ← getElement className
   clickEl element
 
-getElementText ∷ String → ConcreteFeature String
+getElementText ∷ ∀ e. String → ConcreteFeature e String
 getElementText className = do
   element ← getElement className
   getText element
 
-getElement ∷ String → ConcreteFeature Element
+getElement ∷ ∀ e. String → ConcreteFeature e Element
 getElement className = do
   locator ← byClassName className
   element ← findElement locator
   handleMaybe element
 
-    where handleMaybe ∷ Maybe Element → ConcreteFeature Element
+    where handleMaybe ∷ ∀ e. Maybe Element → ConcreteFeature e Element
           handleMaybe (Just e) = pure e
           handleMaybe Nothing = throwError $ error $ "Element with class: " ⊕ className ⊕ " is not present"
 
-expectNoChangeOnClick ∷ String → String → ConcreteFeature Unit
+expectNoChangeOnClick ∷ ∀ e. String → String → ConcreteFeature e Unit
 expectNoChangeOnClick = expectChangeOnFunction expectToEqual
-expectChangeOnClick ∷ String → String → ConcreteFeature Unit
+expectChangeOnClick ∷ ∀ e. String → String → ConcreteFeature e Unit
 expectChangeOnClick = expectChangeOnFunction expectToNotEqual
-expectChangeOnFunction ∷ (String → String → ConcreteFeature Unit) → String → String → ConcreteFeature Unit
+expectChangeOnFunction ∷ ∀ e. (String → String → ConcreteFeature e Unit) → String → String → ConcreteFeature e Unit
 expectChangeOnFunction f contentElement buttonElement = do
   beforeClick ← getElementText contentElement
   clickElement buttonElement
@@ -41,12 +41,12 @@ expectChangeOnFunction f contentElement buttonElement = do
   f beforeClick afterClick
 
 
-expectToEqual ∷ ∀ a. Show a ⇒ Eq a ⇒ a → a → ConcreteFeature Unit
+expectToEqual ∷ ∀ a e. Show a ⇒ Eq a ⇒ a → a → ConcreteFeature e Unit
 expectToEqual = expectCompare (≡)
 
-expectToNotEqual ∷ ∀ a. Show a ⇒ Eq a ⇒ a → a → ConcreteFeature Unit
+expectToNotEqual ∷ ∀ a e. Show a ⇒ Eq a ⇒ a → a → ConcreteFeature e Unit
 expectToNotEqual = expectCompare (≢)
 
-expectCompare ∷ ∀ a. Show a ⇒ Eq a ⇒ (a → a → Boolean ) → a → a → ConcreteFeature Unit
+expectCompare ∷ ∀ a e. Show a ⇒ Eq a ⇒ (a → a → Boolean ) → a → a → ConcreteFeature e Unit
 expectCompare f a b | f a b     = pure unit
                     | otherwise = throwError $ error $ "Expected comparison of " ⊕ (show a) ⊕ " and " ⊕ (show b) ⊕ " to be true."

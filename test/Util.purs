@@ -38,7 +38,7 @@ showImageFile =
 
 logCurrentScreen ∷ ∀ eff o. Feature eff o Unit
 logCurrentScreen =
-  saveScreenshot path *> logScreenshot path
+  saveScreenshot path -- *> logScreenshot path
   where
   path = "current.png"
   message = ("Screenshot taken now:\ndata:image/png;base64," <> _)

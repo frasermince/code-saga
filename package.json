@@ -15,13 +15,14 @@
     "dev": "npm run clean && node ./webpack.config.client.js",
     "serve": "npm run build && node ./dist/server.js",
     "start": "npm run dev",
-    "watch": "pscid --test --censor-codes=UnusedFFIImplementations"
+    "watch": "pscid --test --censor-codes=UnusedFFIImplementations",
+    "test": "npm run clean && node ./webpack.config.test.js"
   },
   "repository": {
     "type": "git",
     "url": "git://github.com/frasermince/code-saga.git"
   },
-  "author": "Alexander C. Mingoia",
+  "author": "Fraser Mince",
   "license": "BSD-3-Clause",
   "bugs": {
     "url": "https://github.com/frasermince/code-saga/issues"

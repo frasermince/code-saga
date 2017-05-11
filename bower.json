@@ -17,7 +17,8 @@
     "purescript-affjax": "^4.0.0",
     "purescript-hyper": "^0.7.3",
     "purescript-webdriver": "^4.0.0",
-    "purescript-debug": "^3.0.0"
+    "purescript-debug": "^3.0.0",
+    "purescript-signal": "^9.0.0"
   },
   "devDependencies": {
     "purescript-chalky": "^2.0.0"

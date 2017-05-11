@@ -17,23 +17,26 @@ import Data.Maybe (fromMaybe, Maybe(..))
 import Selenium (quit)
 import Selenium.Browser (Browser(..), browserCapabilities)
 import Selenium.Builder (withCapabilities, build)
-import Selenium.Monad (get, setWindowSize, byId, findElement, byClassName, getText, clickEl)
-import Test.Feature (ConcreteFeature, ConcreteEffects, Config)
+import Selenium.Monad (get, setWindowSize, byId, findElement, byClassName, getText, clickEl, startSpying)
+import Test.Feature (ConcreteFeature, ConcreteEffects, Config, TestEffects)
 import Test.Scenario (scenario)
 import Text.Chalky (green, red, yellow)
 import Data.Time.Duration (Milliseconds(..))
 import Test.Interaction (expectChangeOnClick, expectNoChangeOnClick, clickElement, expectToEqual, getElementText)
+import Server as Server
+import App.State (init)
 
 
 -- import CodeSaga.Server.Test (launchServer)
 -- import Control.Monad.Eff (Eff)
 
 
-main ∷ Eff (ConcreteEffects) Unit
+-- main ∷ Eff (TestEffects) Unit
 main = do
   void $ runAff errHandler (const $ Process.exit 0) do
     log $ yellow "Starting tests"
-    testResults ← attempt $  runTests $ {selenium: {waitTime: Milliseconds(60.0)}}
+    -- _ ← liftEff' Server.testMain
+    testResults ← attempt $ runTests $ {selenium: {waitTime: Milliseconds(60.0)}}
     case testResults of
       Left e → throwError e
       Right _ → log $ green "Tests passed!"
@@ -43,7 +46,7 @@ main = do
       traverse_ (Ec.log ∘ red) $ S.split (S.Pattern "\n") $ fromMaybe "" $ stack e
       Process.exit 1
 
-runTests ∷ Config → Aff ConcreteEffects Unit
+runTests ∷ ∀ e. Config → Aff (ConcreteEffects e) Unit
 runTests config = do
   driver ← build do
     withCapabilities $ browserCapabilities Chrome
@@ -59,50 +62,58 @@ runTests config = do
   apathize $ quit driver
   either throwError (const $ pure unit) res
 
-openSite ∷ ConcreteFeature Unit
-openSite = get "http://localhost:3000/presentation/project_name/2"
+openSite ∷ ∀ e. ConcreteFeature e Unit
+openSite = do
+  get "http://localhost:3000/presentation/project_name/2"
+  startSpying
 
-closeSite ∷ ConcreteFeature Unit
+closeSite ∷ ∀ e. ConcreteFeature e Unit
 closeSite = pure unit
 
 testScenario
-  ∷ ConcreteFeature Unit
+  ∷ ∀ e. ConcreteFeature e Unit
    → String
    → Array String
-   → ConcreteFeature Unit
-   → ConcreteFeature Unit
+   → ConcreteFeature e Unit
+   → ConcreteFeature e Unit
 testScenario = scenario "Concrete Test" (openSite)
-tests ∷ ConcreteFeature Unit
+tests ∷ ∀ e. ConcreteFeature e Unit
 tests = do
   testScenario closeSite "View First Slide Of Code" [] do
     expectElementPresent "presentation"
+
   testScenario closeSite "Clicking Next Changes Contents" [] do
     expectChangeOnClick "presentation" "next"
+
   testScenario closeSite "Clicking Previous Changes Contents" [] do
     expectChangeOnClick "presentation" "previous"
+
   testScenario closeSite "Clicking Previous Then Next yields the same contents" [] do
     beforeText ← getElementText "presentation"
     clickElement "previous"
     clickElement "next"
     afterText ← getElementText "presentation"
     expectToEqual beforeText afterText
+
   testScenario closeSite "Clicking Previous On First Slide Does Nothing" [] do
     clickElement "previous"
     expectNoChangeOnClick "presentation" "previous"
+
   testScenario closeSite "Clicking Next On Last Slide Does Nothing" [] do
     clickElement "next"
     expectNoChangeOnClick "presentation" "next"
+
   testScenario closeSite "Going To Invalid Url Should Redirect To Not Found" ["Currently does not work"] do
     get "http://localhost:3000/presentation/project_name/5"
     expectElementNotPresent "next"
 
 
-expectElementNotPresent ∷ String → ConcreteFeature Unit
+expectElementNotPresent ∷ ∀ e. String → ConcreteFeature e Unit
 expectElementNotPresent klass = byClassName klass >>= findElement >>= elementExists
   where elementExists (Just x) = throwError $ error $ "Element exists with class: " ⊕ klass
         elementExists Nothing = pure unit
 
-expectElementPresent ∷ String → ConcreteFeature Unit
+expectElementPresent ∷ ∀ e. String → ConcreteFeature e Unit
 expectElementPresent klass = byClassName klass >>= findElement >>= elementExists
   where elementExists (Just x) = pure unit
         elementExists Nothing = throwError $ error $ "Element does not exist with class: " ⊕ klass
