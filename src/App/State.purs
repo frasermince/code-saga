@@ -41,10 +41,11 @@ instance showState :: Show State where show = genericShow
 defaultSlides ∷ Array SlideData
 defaultSlides =
   [
-    SlideData {fileName: "CODE FOR PRESENTATION 1", lineNumber: 1, annotation: "HI"}
-  , SlideData {fileName: "CODE FOR PRESENTATION 2", lineNumber: 1, annotation: "HI"}
-  , SlideData {fileName: "CODE FOR PRESENTATION 3", lineNumber: 1, annotation: "HI"}
+    SlideData {fileName: "MultiplyMeApi/app/controllers/api/v1/accounts_controller.rb", lineNumber: 1, annotation: "HI"}
+  , SlideData {fileName: "MultiplyMeApi/app/controllers/api/v1/donations_controller.rb", lineNumber: 1, annotation: "HI"}
+  , SlideData {fileName: "MultiplyMeApi/app/controllers/api/v1/organizations_controller.rb", lineNumber: 1, annotation: "HI"}
   ]
+
 
 initWithSlides ∷ String → Array SlideData → State
 initWithSlides url slides = State

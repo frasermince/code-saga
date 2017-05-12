@@ -40,6 +40,9 @@ expectChangeOnFunction f contentElement buttonElement = do
   afterClick ← getElementText contentElement
   f beforeClick afterClick
 
+expectTextToEqual ∷ ∀ e. String → String → ConcreteFeature e Unit
+expectTextToEqual klass expected = (getElementText klass) >>= (expectToEqual expected)
+
 
 expectToEqual ∷ ∀ a e. Show a ⇒ Eq a ⇒ a → a → ConcreteFeature e Unit
 expectToEqual = expectCompare (≡)

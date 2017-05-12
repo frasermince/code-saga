@@ -4,6 +4,7 @@ import Prelude
 import App.Prelude
 import Control.Monad.Eff.Console as Ec
 import Data.String as S
+import Data.Newtype (unwrap)
 import Node.Process as Process
 import Control.Monad.Aff (Aff, attempt, apathize, runAff, liftEff')
 import Control.Monad.Aff.Console (log)
@@ -13,24 +14,67 @@ import Control.Monad.Error.Class (throwError)
 import Control.Monad.Reader.Trans (runReaderT)
 import Data.Either (Either(..), either)
 import Data.Foldable (traverse_)
-import Data.Maybe (fromMaybe, Maybe(..))
+import Data.Maybe (fromMaybe, Maybe(..), fromJust)
+import Data.Array (foldl)
 import Selenium (quit)
 import Selenium.Browser (Browser(..), browserCapabilities)
 import Selenium.Builder (withCapabilities, build)
-import Selenium.Monad (get, setWindowSize, byId, findElement, byClassName, getText, clickEl, startSpying)
+import Selenium.Monad (get, setWindowSize, byId, findElement, byClassName, getText, clickEl)
 import Test.Feature (ConcreteFeature, ConcreteEffects, Config, TestEffects)
 import Test.Scenario (scenario)
 import Text.Chalky (green, red, yellow)
 import Data.Time.Duration (Milliseconds(..))
-import Test.Interaction (expectChangeOnClick, expectNoChangeOnClick, clickElement, expectToEqual, getElementText)
+import Test.Interaction (expectChangeOnClick, expectNoChangeOnClick, clickElement, expectToEqual, getElementText, expectTextToEqual)
 import Server as Server
-import App.State (init, defaultSlides)
+import Debug.Trace
+import App.State (init, defaultSlides, SlideData(..))
 
 
--- import CodeSaga.Server.Test (launchServer)
--- import Control.Monad.Eff (Eff)
+tests ∷ ∀ e. ConcreteFeature e Unit
+tests = do
+  testScenario closeSite "View First Slide Of Code" [] do
+    expectElementPresent "presentation"
+
+  testScenario closeSite "Clicking Next Changes Contents" [] do
+    expectChangeOnClick "presentation" "next"
+
+  testScenario closeSite "Clicking Previous Changes Contents" [] do
+    expectChangeOnClick "presentation" "previous"
+
+  testScenario closeSite "Clicking Previous Then Next yields the same contents" [] do
+    beforeText ← getElementText "presentation"
+    clickElement "previous"
+    clickElement "next"
+    afterText ← getElementText "presentation"
+    expectToEqual beforeText afterText
+
+  testScenarioWithOpen (openSlide 1) closeSite "Clicking Previous On First Slide Does Nothing" [] do
+    expectNoChangeOnClick "presentation" "previous"
+
+  testScenarioWithOpen (openSlide 3) closeSite "Clicking Next On Last Slide Does Nothing" [] do
+    expectNoChangeOnClick "presentation" "next"
+
+  testScenarioWithOpen (openSlide 5) closeSite "Going To Invalid Url Should Redirect To Not Found" ["Need to make invalid urls redirect"] do
+    expectElementNotPresent "next"
+
+  testScenarioWithOpen (openSlide 1) closeSite "The correct slide should show the code from the file associated with it" [] do
+    foldl accumulateSlides (pure unit) defaultSlides
+
+accumulateSlides ∷ ∀ e. ConcreteFeature e Unit → SlideData → ConcreteFeature e Unit
+accumulateSlides accum (SlideData s) = accum *> (expectTextToEqual "presentation-code" s.fileName) *> clickElement "next"
+
+openSlide ∷ ∀ e. Int → ConcreteFeature e Unit
+openSlide number = get $ spy $ "http://localhost:3000/presentation/project_name/" ⊕ (show number)
 
 
+
+testSlides ∷ Array SlideData
+testSlides =
+  [
+    SlideData {fileName: "MultiplyMeApi/app/controllers/api/v1/accounts_controller.rb", lineNumber: 1, annotation: "HI"}
+  , SlideData {fileName: "MultiplyMeApi/app/controllers/api/v1/donations_controller.rb", lineNumber: 1, annotation: "HI"}
+  , SlideData {fileName: "MultiplyMeApi/app/controllers/api/v1/organizations_controller.rb", lineNumber: 1, annotation: "HI"}
+  ]
 -- main ∷ Eff (TestEffects) Unit
 main = do
   void $ runAff errHandler (const $ Process.exit 0) do
@@ -64,8 +108,7 @@ runTests config = do
 
 openSite ∷ ∀ e. ConcreteFeature e Unit
 openSite = do
-  get "http://localhost:3000/presentation/project_name/2"
-  startSpying
+  openSlide 2
 
 closeSite ∷ ∀ e. ConcreteFeature e Unit
 closeSite = pure unit
@@ -77,36 +120,7 @@ testScenario
    → ConcreteFeature e Unit
    → ConcreteFeature e Unit
 testScenario = scenario "Concrete Test" (openSite)
-tests ∷ ∀ e. ConcreteFeature e Unit
-tests = do
-  testScenario closeSite "View First Slide Of Code" [] do
-    expectElementPresent "presentation"
-
-  testScenario closeSite "Clicking Next Changes Contents" [] do
-    expectChangeOnClick "presentation" "next"
-
-  testScenario closeSite "Clicking Previous Changes Contents" [] do
-    expectChangeOnClick "presentation" "previous"
-
-  testScenario closeSite "Clicking Previous Then Next yields the same contents" [] do
-    beforeText ← getElementText "presentation"
-    clickElement "previous"
-    clickElement "next"
-    afterText ← getElementText "presentation"
-    expectToEqual beforeText afterText
-
-  testScenario closeSite "Clicking Previous On First Slide Does Nothing" [] do
-    clickElement "previous"
-    expectNoChangeOnClick "presentation" "previous"
-
-  testScenario closeSite "Clicking Next On Last Slide Does Nothing" [] do
-    clickElement "next"
-    expectNoChangeOnClick "presentation" "next"
-
-  testScenario closeSite "Going To Invalid Url Should Redirect To Not Found" ["Currently does not work"] do
-    get "http://localhost:3000/presentation/project_name/5"
-    expectElementNotPresent "next"
-
+testScenarioWithOpen = scenario "Concrete Test"
 
 expectElementNotPresent ∷ ∀ e. String → ConcreteFeature e Unit
 expectElementNotPresent klass = byClassName klass >>= findElement >>= elementExists

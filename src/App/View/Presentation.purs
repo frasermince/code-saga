@@ -31,6 +31,6 @@ notFound = div #! onLoad (Navigate "/not_found") $ text "No slide"
 view ∷ State → HTML Event
 view s =
   div ! className "presentation" $ do
-    pre $ code $ maybe notFound text (unwrap $ _.currentSlideContent $ unwrap $ s)
+    pre $ code ! className "presentation-code" $ maybe notFound text (unwrap $ _.currentSlideContent $ unwrap $ s)
     button ! className "previous" #! onClick PreviousSlide $ text "previous"
     button ! className "next" #! onClick NextSlide  $ text "next"
