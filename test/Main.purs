@@ -5,10 +5,13 @@ import App.Prelude
 import Control.Monad.Eff.Console as Ec
 import Data.String as S
 import Data.Newtype (unwrap)
+import Node.FS.Sync (readTextFile)
+import Node.Encoding (Encoding(..))
 import Node.Process as Process
 import Control.Monad.Aff (Aff, attempt, apathize, runAff, liftEff')
 import Control.Monad.Aff.Console (log)
 import Control.Monad.Eff (Eff)
+import Control.Monad.Eff.Class (liftEff)
 import Control.Monad.Eff.Exception (throw, message, stack, error)
 import Control.Monad.Error.Class (throwError)
 import Control.Monad.Reader.Trans (runReaderT)
@@ -61,7 +64,13 @@ tests = do
     foldl accumulateSlides (pure unit) defaultSlides
 
 accumulateSlides ∷ ∀ e. ConcreteFeature e Unit → SlideData → ConcreteFeature e Unit
-accumulateSlides accum (SlideData s) = accum *> (expectTextToEqual "presentation-code" s.fileName) *> clickElement "next"
+accumulateSlides accum (SlideData s) = accum
+                                       *> readFromSlideFile
+                                       *> clickElement "next"
+  where readFromSlideFile ∷ ∀ e. ConcreteFeature e Unit
+        readFromSlideFile = do
+          text ← liftEff $ readTextFile UTF8 s.fileName
+          expectTextToEqual "presentation-code" text
 
 openSlide ∷ ∀ e. Int → ConcreteFeature e Unit
 openSlide number = get $ spy $ "http://localhost:3000/presentation/project_name/" ⊕ (show number)
