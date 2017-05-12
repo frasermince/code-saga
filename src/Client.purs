@@ -1,6 +1,7 @@
 module Client where
 
-import App.Events (AppEffects, Event(..), foldp)
+import App.Events (Event(..), foldp)
+import App.Effects (AppEffects)
 import App.Routes (match)
 import App.State (State, init)
 import App.View.Layout (view)

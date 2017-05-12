@@ -1,7 +1,8 @@
 module Server where
 
 import Prelude
-import App.Events (AppEffects, Event(..), foldp)
+import App.Events (Event(..), foldp)
+import App.Effects (AppEffects)
 import App.Routes (Route(..), match)
 import App.State (State(..), init, initWithSlides, SlideData(..))
 import App.View.HTMLWrapper (htmlWrapper)

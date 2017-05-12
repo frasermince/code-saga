@@ -4,43 +4,34 @@ import Prelude
 import App.Prelude
 import App.Routes (Route(..), match, toURL)
 import App.State (State(..), SlideData(..))
+import App.Util (findSlide)
 import Control.Monad.Eff.Class (liftEff)
-import DOM (DOM)
 import DOM.Event.Event (preventDefault)
 import DOM.HTML (window)
 import DOM.HTML.History (DocumentTitle(..), URL(..), pushState)
-import DOM.HTML.Types (HISTORY)
 import DOM.HTML.Window (history)
 import Data.Foreign (toForeign)
-import Data.Maybe (Maybe(..), maybe, isNothing, isJust)
-import Network.HTTP.Affjax (AJAX)
-import Pux (EffModel, noEffects, onlyEffects)
+import Data.Maybe (Maybe(..), isNothing, isJust)
+import Pux (EffModel, noEffects, onlyEffects, mapEffects)
 import Pux.DOM.Events (DOMEvent)
 import Data.Array (index)
 import Data.Newtype (unwrap, wrap)
 import Data.Foreign.NullOrUndefined (NullOrUndefined(..))
+import App.ProjectEvents as PE
+import App.Effects (AppEffects)
 
 data Event = PageView Route
            | PreviousSlide DOMEvent
            | NextSlide DOMEvent
            | Navigate String DOMEvent
+           | ProjectEvent PE.Event
 
-type AppEffects fx = (ajax :: AJAX, dom ∷ DOM, history ∷ HISTORY | fx)
 
 foldp :: ∀ fx. Event -> State -> EffModel State Event (AppEffects fx)
-foldp (PageView route) st =
-  noEffects $ newState route st
+foldp (PageView (Slide name number)) st = PE.foldp (PE.PageView name number) st # mapEffects ProjectEvent
+foldp (PageView route) (State st) = noEffects $ State st { route = route, loaded = true }
 
-  where newState ∷ Route → State → State
-        newState route (State st) = case route of
-          Slide name number → makeState (State st) number route
-          _ → State st { route = route, loaded = true }
-
-        makeState ∷ State → Int → Route → State
-        makeState st number route = (slideState st route) $ _.fileName ∘ unwrap <$> findSlide st number
-
-        slideState ∷ State → Route → Maybe String → State
-        slideState (State st) route text = State st { route = route, loaded = true, currentSlideContent = wrap text }
+foldp (ProjectEvent event) st = PE.foldp event st # mapEffects ProjectEvent
 
 foldp (PreviousSlide ev) (State st) =
   onlyEffects (State st) [ do
@@ -76,8 +67,6 @@ foldp (Navigate url ev) state =
 
 
 
-findSlide ∷ State → Int → Maybe SlideData
-findSlide (State st) number = index st.slides (number - 1)
 
 
 navigateToSlideWith ∷ (Int → Int) → State → DOMEvent → Maybe Event
