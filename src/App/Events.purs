@@ -28,7 +28,11 @@ data Event = PageView Route
 
 
 foldp :: ∀ fx. Event -> State -> EffModel State Event (AppEffects fx)
-foldp (PageView (Slide name number)) st = PE.foldp (PE.PageView name number) st # mapEffects ProjectEvent
+foldp (PageView (Slide name number)) st = --PE.foldp (PE.PageView name number) st # mapEffects ProjectEvent
+  onlyEffects st [ do
+    pure unit
+    pure $ Just $ ProjectEvent $ PE.PageView name number
+  ]
 foldp (PageView route) (State st) = noEffects $ State st { route = route, loaded = true }
 
 foldp (ProjectEvent event) st = PE.foldp event st # mapEffects ProjectEvent
