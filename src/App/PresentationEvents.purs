@@ -1,4 +1,4 @@
-module App.ProjectEvents where
+module App.PresentationEvents where
 
 import Prelude
 import App.Prelude
@@ -22,5 +22,5 @@ foldp (PageView name number) (State st) = noEffects $ makeState
         getFileContents = _.fileName ∘ unwrap
 
         slideState ∷ Maybe String → State
-        slideState text = State st { route = Slide name number, loaded = true, currentSlideContent = wrap text }
+        slideState text = State st { route = Presentation name number, loaded = true, currentSlideContent = wrap text }
 

@@ -30,6 +30,7 @@ import Node.HTTP (HTTP)
 import Node.Process (PROCESS, lookupEnv)
 import Pux (CoreEffects, start, waitState)
 import Pux.Renderer.React (renderToString, renderToStaticMarkup)
+import Data.Array (null)
 import Signal (constant)
 
 appHandler
@@ -50,7 +51,7 @@ appHandler slides = do
   request <- getRequestData
 
   app <- liftEff $ start
-    { initialState: initWithSlides request.url slides
+    { initialState: if (null slides) then (init request.url) else (initWithSlides request.url slides)
     , view
     , foldp
     , inputs: [constant (PageView (match request.url))]

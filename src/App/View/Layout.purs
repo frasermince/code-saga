@@ -3,7 +3,7 @@ module App.View.Layout where
 import App.View.Homepage as Homepage
 import App.View.NotFound as NotFound
 import App.View.Presentation as Presentation
-import App.Routes (Route(NotFound, Home, Slide))
+import App.Routes (Route(NotFound, Home, Presentation))
 import App.State (State(..))
 import App.Events (Event)
 import CSS (CSS, fromString, (?), fontSize, display, inlineBlock, marginTop, marginRight, marginLeft, px, value, key, color, backgroundColor, padding, borderRadius)
@@ -26,7 +26,7 @@ view (State st) =
 
     case st.route of
       (Home) -> Homepage.view (State st)
-      (Slide _ _) -> Presentation.view (State st)
+      (Presentation _ _) -> Presentation.view (State st)
       (NotFound url) -> NotFound.view (State st)
 
 css :: CSS

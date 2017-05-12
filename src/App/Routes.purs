@@ -17,7 +17,7 @@ import Control.Alt ((<|>))
 type ProjectName = String
 type SlideNumber = Int
 
-data Route = Home | NotFound String | Slide ProjectName SlideNumber
+data Route = Home | NotFound String | Presentation ProjectName SlideNumber
 
 derive instance genericRoute :: Generic Route _
 instance showRoute :: Show Route where show = genericShow
@@ -30,7 +30,7 @@ match :: String -> Route
 match url = fromMaybe (NotFound url) $ router url $
   Home <$ end
   <|>
-  Slide <$> (lit "presentation" *> str) <*> int <* end
+  Presentation <$> (lit "presentation" *> str) <*> int <* end
   <|>
   NotFound "/not_found" <$ lit "not_found" <* end
 
@@ -38,4 +38,4 @@ match url = fromMaybe (NotFound url) $ router url $
 toURL :: Route -> String
 toURL (NotFound url) = url
 toURL (Home) = "/"
-toURL (Slide projectName slideNumber) = "/presentation/" ⊕ projectName ⊕ "/" ⊕ show slideNumber
+toURL (Presentation projectName slideNumber) = "/presentation/" ⊕ projectName ⊕ "/" ⊕ show slideNumber

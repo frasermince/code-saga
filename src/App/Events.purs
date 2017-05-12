@@ -17,25 +17,25 @@ import Pux.DOM.Events (DOMEvent)
 import Data.Array (index)
 import Data.Newtype (unwrap, wrap)
 import Data.Foreign.NullOrUndefined (NullOrUndefined(..))
-import App.ProjectEvents as PE
+import App.PresentationEvents as PE
 import App.Effects (AppEffects)
 
 data Event = PageView Route
            | PreviousSlide DOMEvent
            | NextSlide DOMEvent
            | Navigate String DOMEvent
-           | ProjectEvent PE.Event
+           | PresentationEvent PE.Event
 
 
 foldp :: ∀ fx. Event -> State -> EffModel State Event (AppEffects fx)
-foldp (PageView (Slide name number)) st = --PE.foldp (PE.PageView name number) st # mapEffects ProjectEvent
+foldp (PageView (Presentation name number)) st =
   onlyEffects st [ do
     pure unit
-    pure $ Just $ ProjectEvent $ PE.PageView name number
+    pure $ Just $ PresentationEvent $ PE.PageView name number
   ]
 foldp (PageView route) (State st) = noEffects $ State st { route = route, loaded = true }
 
-foldp (ProjectEvent event) st = PE.foldp event st # mapEffects ProjectEvent
+foldp (PresentationEvent event) st = PE.foldp event st # mapEffects PresentationEvent
 
 foldp (PreviousSlide ev) (State st) =
   onlyEffects (State st) [ do
@@ -66,7 +66,7 @@ foldp (Navigate url ev) state =
                              | otherwise = route
 
         shouldRedirect ∷ Route → State → Boolean
-        shouldRedirect (Slide _ number) state = isNothing $ findSlide state number
+        shouldRedirect (Presentation _ number) state = isNothing $ findSlide state number
         shouldRedirect _ _ = false
 
 
@@ -79,8 +79,8 @@ navigateToSlideWith f (State st) event = createNavigate ∘ toURL <$> changeSlid
         createNavigate = flip Navigate event
 
         changeSlideNumber ∷ Route → Maybe Route
-        changeSlideNumber (Slide projectName slideNumber)
-          | isJust $ findSlide (State st) $ f slideNumber = Just $ Slide projectName $ f slideNumber
+        changeSlideNumber (Presentation projectName slideNumber)
+          | isJust $ findSlide (State st) $ f slideNumber = Just $ Presentation projectName $ f slideNumber
           | otherwise                                     = Nothing
 
         changeSlideNumber _ = Nothing
