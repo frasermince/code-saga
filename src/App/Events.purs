@@ -17,25 +17,15 @@ import Pux.DOM.Events (DOMEvent)
 import Data.Array (index)
 import Data.Newtype (unwrap, wrap)
 import Data.Foreign.NullOrUndefined (NullOrUndefined(..))
-import App.PresentationEvents as PE
 import App.Effects (AppEffects)
 
 data Event = PageView Route
            | PreviousSlide DOMEvent
            | NextSlide DOMEvent
            | Navigate String DOMEvent
-           | PresentationEvent PE.Event
 
 
-foldp :: ∀ fx. Event -> State -> EffModel State Event (AppEffects fx)
-foldp (PageView (Presentation name number)) st =
-  onlyEffects st [ do
-    pure unit
-    pure $ Just $ PresentationEvent $ PE.PageView name number
-  ]
 foldp (PageView route) (State st) = noEffects $ State st { route = route, loaded = true }
-
-foldp (PresentationEvent event) st = PE.foldp event st # mapEffects PresentationEvent
 
 foldp (PreviousSlide ev) (State st) =
   onlyEffects (State st) [ do
@@ -59,19 +49,8 @@ foldp (Navigate url ev) state =
       preventDefault ev
       h <- history =<< window
       pushState (toForeign {}) (DocumentTitle "") (URL url) h
-    pure $ Just $ PageView $ redirect (match url) state
+    pure $ Just $ PageView $ match url
   ]
-  where redirect ∷ Route → State → Route
-        redirect route state | shouldRedirect route state = match "/not_found"
-                             | otherwise = route
-
-        shouldRedirect ∷ Route → State → Boolean
-        shouldRedirect (Presentation _ number) state = isNothing $ findSlide state number
-        shouldRedirect _ _ = false
-
-
-
-
 
 navigateToSlideWith ∷ (Int → Int) → State → DOMEvent → Maybe Event
 navigateToSlideWith f (State st) event = createNavigate ∘ toURL <$> changeSlideNumber st.route

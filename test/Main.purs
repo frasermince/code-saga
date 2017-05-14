@@ -29,8 +29,7 @@ import Text.Chalky (green, red, yellow)
 import Data.Time.Duration (Milliseconds(..))
 import Test.Interaction (expectChangeOnClick, expectNoChangeOnClick, clickElement, expectToEqual, getElementText, expectTextToEqual)
 import Server as Server
-import Debug.Trace
-import App.State (init, defaultSlides, SlideData(..))
+import App.State (defaultSlides, SlideData(..), PreFetchSlide(..))
 
 
 tests ∷ ∀ e. ConcreteFeature e Unit
@@ -57,32 +56,32 @@ tests = do
   testScenarioWithOpen (openSlide 3) closeSite "Clicking Next On Last Slide Does Nothing" [] do
     expectNoChangeOnClick "presentation" "next"
 
-  testScenarioWithOpen (openSlide 5) closeSite "Going To Invalid Url Should Redirect To Not Found" ["Need to make invalid urls redirect"] do
+  testScenarioWithOpen (openSlide 5) closeSite "Going To Invalid Url Should Redirect To Not Found" [] do
     expectElementNotPresent "next"
 
   testScenarioWithOpen (openSlide 1) closeSite "The correct slide should show the code from the file associated with it" [] do
-    foldl accumulateSlides (pure unit) defaultSlides
+    foldl compareSlide (pure unit) defaultSlides
 
-accumulateSlides ∷ ∀ e. ConcreteFeature e Unit → SlideData → ConcreteFeature e Unit
-accumulateSlides accum (SlideData s) = accum
-                                       *> readFromSlideFile
-                                       *> clickElement "next"
+compareSlide ∷ ∀ e. ConcreteFeature e Unit → PreFetchSlide → ConcreteFeature e Unit
+compareSlide accum (PreFetchSlide s) = accum
+                                           *> readFromSlideFile
+                                           *> clickElement "next"
   where readFromSlideFile ∷ ∀ e. ConcreteFeature e Unit
         readFromSlideFile = do
           text ← liftEff $ readTextFile UTF8 s.fileName
           expectTextToEqual "presentation-code" text
 
 openSlide ∷ ∀ e. Int → ConcreteFeature e Unit
-openSlide number = get $ spy $ "http://localhost:3000/presentation/project_name/" ⊕ (show number)
+openSlide number = get $ "http://localhost:3000/presentation/project_name/" ⊕ (show number)
 
 
 
-testSlides ∷ Array SlideData
+testSlides ∷ Array PreFetchSlide
 testSlides =
   [
-    SlideData {fileName: "MultiplyMeApi/app/controllers/api/v1/accounts_controller.rb", lineNumber: 1, annotation: "HI"}
-  , SlideData {fileName: "MultiplyMeApi/app/controllers/api/v1/donations_controller.rb", lineNumber: 1, annotation: "HI"}
-  , SlideData {fileName: "MultiplyMeApi/app/controllers/api/v1/organizations_controller.rb", lineNumber: 1, annotation: "HI"}
+    PreFetchSlide {fileName: "MultiplyMeApi/app/controllers/api/v1/accounts_controller.rb", lineNumber: 1, annotation: "HI"}
+  , PreFetchSlide {fileName: "MultiplyMeApi/app/controllers/api/v1/donations_controller.rb", lineNumber: 1, annotation: "HI"}
+  , PreFetchSlide {fileName: "MultiplyMeApi/app/controllers/api/v1/organizations_controller.rb", lineNumber: 1, annotation: "HI"}
   ]
 -- main ∷ Eff (TestEffects) Unit
 main = do

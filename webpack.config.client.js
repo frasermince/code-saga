@@ -82,6 +82,9 @@ const config = {
     cached: false,
     modules: false,
     chunkModules: false
+  },
+  node: {
+    fs: 'empty'
   }
 }
 

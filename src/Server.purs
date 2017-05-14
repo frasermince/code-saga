@@ -4,7 +4,7 @@ import Prelude
 import App.Events (Event(..), foldp)
 import App.Effects (AppEffects)
 import App.Routes (Route(..), match)
-import App.State (State(..), init, initWithSlides, SlideData(..))
+import App.State (State(..),  initWithSlides, defaultSlides, PreFetchSlide(..), transform)
 import App.View.HTMLWrapper (htmlWrapper)
 import App.View.Layout (view)
 import Control.IxMonad (ibind)
@@ -15,7 +15,7 @@ import Control.Monad.Eff.Console (CONSOLE)
 import Data.Int (fromString)
 import Data.Foreign.Generic (defaultOptions, genericEncodeJSON)
 import Data.Maybe (fromMaybe)
-import Data.Newtype (un)
+import Data.Newtype (un, unwrap)
 import Hyper.Node.Server (runServer, defaultOptionsWithLogging)
 import Hyper.Port (Port(Port))
 import Hyper.Conn (Conn)
@@ -41,17 +41,22 @@ appHandler
   => Request req m
   => Response res m b
   => ResponseWritable b m String
-  => Array SlideData →
+  => Array PreFetchSlide →
      Middleware
      m
      (Conn req (res StatusLineOpen) c)
      (Conn req (res ResponseEnded) c)
      Unit
 appHandler slides = do
-  request <- getRequestData
+  request ← getRequestData
 
-  app <- liftEff $ start
-    { initialState: if (null slides) then (init request.url) else (initWithSlides request.url slides)
+  let prefetch = if (null slides) then defaultSlides else slides
+  slideContents ← lift' $ liftEff $ transform prefetch
+
+  -- slideContents ← liftEff $ _.slides $ unwrap $ state
+
+  app ← liftEff $ start
+    { initialState: initWithSlides request.url slideContents
     , view
     , foldp
     , inputs: [constant (PageView (match request.url))]
@@ -78,7 +83,7 @@ appHandler slides = do
 -- | Starts server (for development).
 main :: Eff (CoreEffects (AppEffects (buffer :: BUFFER, fs :: FS, http :: HTTP, console :: CONSOLE, process :: PROCESS))) Unit
 main = testMain []
-testMain :: ∀ e. Array SlideData → Eff (CoreEffects (AppEffects (buffer :: BUFFER, fs :: FS, http :: HTTP, console :: CONSOLE, process :: PROCESS | e))) Unit
+testMain :: ∀ e. Array PreFetchSlide → Eff (CoreEffects (AppEffects (buffer :: BUFFER, fs :: FS, http :: HTTP, console :: CONSOLE, process :: PROCESS | e))) Unit
 testMain slides = do
   port <- (fromMaybe 0 <<< fromString <<< fromMaybe "3000") <$> lookupEnv "PORT"
   let app = fileServer "static" $ appHandler slides

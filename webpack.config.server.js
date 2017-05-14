@@ -59,5 +59,8 @@ module.exports = {
     cached: false,
     modules: false,
     chunkModules: false
+  },
+  node: {
+    fs: 'empty'
   }
 }

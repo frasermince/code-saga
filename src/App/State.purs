@@ -1,6 +1,13 @@
 module App.State where
 
+import Prelude
 import App.Prelude
+import Data.Array (snoc, foldl)
+import Control.Monad.Eff.Exception (EXCEPTION)
+import Node.FS (FS)
+import Node.FS.Sync (readTextFile)
+import Node.Encoding (Encoding(..))
+import Control.Monad.Eff (Eff)
 import App.Config (config)
 import App.Routes (Route, match)
 import Data.Generic.Rep (class Generic)
@@ -17,6 +24,7 @@ newtype SlideData = SlideData
   { fileName ∷ String
   , lineNumber ∷ Int
   , annotation ∷ String
+  , content ∷ String
   }
 
 derive instance genericSlideData :: Generic SlideData _
@@ -26,25 +34,36 @@ instance encodeSlide ∷ Encode SlideData where encode = genericEncode defaultOp
 instance decodeSlide ∷ Decode SlideData where decode = genericDecode defaultOptions
 instance showSlide ∷ Show SlideData where show = genericShow
 
+newtype PreFetchSlide = PreFetchSlide
+  { fileName ∷ String
+  , lineNumber ∷ Int
+  , annotation ∷ String
+  }
+
 newtype State = State
   { title ∷ String
   , route ∷ Route
   , loaded ∷ Boolean
   , slides ∷ Array SlideData
-  , currentSlideContent ∷ NullOrUndefined String
   }
 
 derive instance genericState ∷ Generic State _
 derive instance newtypeState ∷ Newtype State _
-instance showState :: Show State where show = genericShow
+instance showState ∷ Show State where show = genericShow
 
-defaultSlides ∷ Array SlideData
+defaultSlides ∷ Array PreFetchSlide
 defaultSlides =
   [
-    SlideData {fileName: "MultiplyMeApi/app/controllers/api/v1/accounts_controller.rb", lineNumber: 1, annotation: "HI"}
-  , SlideData {fileName: "MultiplyMeApi/app/controllers/api/v1/donations_controller.rb", lineNumber: 1, annotation: "HI"}
-  , SlideData {fileName: "MultiplyMeApi/app/controllers/api/v1/organizations_controller.rb", lineNumber: 1, annotation: "HI"}
+    PreFetchSlide {fileName: "MultiplyMeApi/app/controllers/api/v1/accounts_controller.rb", lineNumber: 1, annotation: "HI"}
+  , PreFetchSlide {fileName: "MultiplyMeApi/app/controllers/api/v1/donations_controller.rb", lineNumber: 1, annotation: "HI"}
+  , PreFetchSlide {fileName: "MultiplyMeApi/app/controllers/api/v1/organizations_controller.rb", lineNumber: 1, annotation: "HI"}
   ]
+transform ∷ ∀ e. Array PreFetchSlide → Eff (exception ∷ EXCEPTION, fs ∷ FS | e) (Array SlideData)
+transform prefetch = foldl toSlideData (pure []) prefetch
+  where toSlideData accum (PreFetchSlide p) = snoc <$> accum <*> (fetchSlide p)
+        fetchSlide p = (makeSlide p) <$> readTextFile UTF8 p.fileName
+        makeSlide {fileName: fileName, lineNumber: lineNumber, annotation: annotation} content =
+          SlideData {fileName: fileName, lineNumber: lineNumber, annotation: annotation, content: content}
 
 
 initWithSlides ∷ String → Array SlideData → State
@@ -53,9 +72,4 @@ initWithSlides url slides = State
   , route: match url
   , loaded: false
   , slides: slides
-  , currentSlideContent: wrap Nothing
   }
-
-
-init :: String -> State
-init url = initWithSlides url defaultSlides
