@@ -1,0 +1,43 @@
+#!/usr/bin/env babel-node
+import {exec} from 'child-process-promise';
+import path from 'path';
+import ygor from 'ygor';
+
+const PROJECT_DIR = path.dirname(__dirname)
+const SRC = `${PROJECT_DIR}/src`
+
+function sleep (ms) {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+const nodePath = extend => `NODE_PATH=${extend}:${process.env.NODE_PATH || ''}`
+
+function babel (options = '') {
+  return `${nodePath(SRC)} babel ${SRC} --source-maps --out-dir ${SRC} ${options}`;
+}
+
+function lint () {
+  return exec('standard src').then(result => console.log(result.stdout));
+}
+
+async function javascriptWatch () {
+  await lint();
+  return exec(babel('-w')).then(result => console.log(result.stdout));
+}
+
+async function dev () {
+  javascriptWatch();
+  await sleep(1000);
+  ygor.shell("npm run clean && node ./webpack.config.client.js");
+}
+
+async function test () {
+  javascriptWatch();
+  await sleep(1000);
+  ygor.shell("npm run clean && node ./webpack.config.test.js");
+}
+
+ygor
+  .task('default', dev)
+  .task('jwatch', javascriptWatch)
+  .task('test', test);

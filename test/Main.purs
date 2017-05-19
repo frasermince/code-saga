@@ -27,11 +27,12 @@ import Test.Feature (ConcreteFeature, ConcreteEffects, Config, TestEffects)
 import Test.Scenario (scenario)
 import Text.Chalky (green, red, yellow)
 import Data.Time.Duration (Milliseconds(..))
-import Test.Interaction (expectChangeOnClick, expectNoChangeOnClick, clickElement, expectToEqual, getElementText, expectTextToEqual)
+import Test.Interaction (expectChangeOnClick, expectNoChangeOnClick, clickElement, expectToEqual, getElementText, expectTextToEqual, getElementTextByXPath)
 import Server as Server
 import App.State (defaultSlides, SlideData(..), PreFetchSlide(..))
 
 
+codeSelector =  "//div[@class=\"presentation\"]//code"
 tests ∷ ∀ e. ConcreteFeature e Unit
 tests = do
   testScenario closeSite "View First Slide Of Code" [] do
@@ -44,10 +45,10 @@ tests = do
     expectChangeOnClick "presentation" "previous"
 
   testScenario closeSite "Clicking Previous Then Next yields the same contents" [] do
-    beforeText ← getElementText "presentation"
+    beforeText ← getElementTextByXPath codeSelector
     clickElement "previous"
     clickElement "next"
-    afterText ← getElementText "presentation"
+    afterText ← getElementTextByXPath codeSelector
     expectToEqual beforeText afterText
 
   testScenarioWithOpen (openSlide 1) closeSite "Clicking Previous On First Slide Does Nothing" [] do
@@ -59,17 +60,18 @@ tests = do
   testScenarioWithOpen (openSlide 5) closeSite "Going To Invalid Url Should Redirect To Not Found" [] do
     expectElementNotPresent "next"
 
-  testScenarioWithOpen (openSlide 1) closeSite "The correct slide should show the code from the file associated with it" [] do
+  testScenarioWithOpen (openSlide 1) closeSite "The correct slide should show the code from the file associated with it and the annotation" [] do
     foldl compareSlide (pure unit) defaultSlides
 
 compareSlide ∷ ∀ e. ConcreteFeature e Unit → PreFetchSlide → ConcreteFeature e Unit
 compareSlide accum (PreFetchSlide s) = accum
-                                           *> readFromSlideFile
-                                           *> clickElement "next"
+                                       *> readFromSlideFile
+                                       *> expectTextToEqual getElementText "presentation-annotation" s.annotation
+                                       *> clickElement "next"
   where readFromSlideFile ∷ ∀ e. ConcreteFeature e Unit
         readFromSlideFile = do
           text ← liftEff $ readTextFile UTF8 s.fileName
-          expectTextToEqual "presentation-code" text
+          expectTextToEqual getElementTextByXPath codeSelector text
 
 openSlide ∷ ∀ e. Int → ConcreteFeature e Unit
 openSlide number = get $ "http://localhost:3000/presentation/project_name/" ⊕ (show number)
@@ -79,7 +81,7 @@ openSlide number = get $ "http://localhost:3000/presentation/project_name/" ⊕ 
 testSlides ∷ Array PreFetchSlide
 testSlides =
   [
-    PreFetchSlide {fileName: "MultiplyMeApi/app/controllers/api/v1/accounts_controller.rb", lineNumber: 1, annotation: "HI"}
+    PreFetchSlide {fileName: "MultiplyMeApi/app/controllers/api/v1/leader_board_controller.rb", lineNumber: 1, annotation: "HI"}
   , PreFetchSlide {fileName: "MultiplyMeApi/app/controllers/api/v1/donations_controller.rb", lineNumber: 1, annotation: "HI"}
   , PreFetchSlide {fileName: "MultiplyMeApi/app/controllers/api/v1/organizations_controller.rb", lineNumber: 1, annotation: "HI"}
   ]

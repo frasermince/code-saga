@@ -2,7 +2,7 @@ module Test.Interaction where
 
 import Prelude
 import App.Prelude
-import Selenium.Monad              (findElement, byClassName, getText, clickEl)
+import Selenium.Monad              (findElement, byClassName, getText, clickEl, byXPath)
 import Selenium.Types              (Element)
 import Test.Feature                (ConcreteFeature)
 import Data.Maybe                  (Maybe(..), fromMaybe)
@@ -17,6 +17,17 @@ clickElement ∷ ∀ e. String → ConcreteFeature e Unit
 clickElement className = do
   element ← getElement className
   clickEl element
+
+getElementTextByXPath ∷ ∀ e. String → ConcreteFeature e String
+getElementTextByXPath selector = do
+  locator ← byXPath selector
+  maybeElement ← findElement locator
+  element ← handleMaybe maybeElement
+  getText element
+
+    where handleMaybe ∷ ∀ e. Maybe Element → ConcreteFeature e Element
+          handleMaybe (Just e) = pure e
+          handleMaybe Nothing = throwError $ error $ "Element with xpath selector: " ⊕ selector ⊕ " is not present"
 
 getElementText ∷ ∀ e. String → ConcreteFeature e String
 getElementText className = do
@@ -46,8 +57,8 @@ expectChangeOnFunction f contentElement buttonElement = do
   afterClick ← getElementText contentElement
   f beforeClick afterClick
 
-expectTextToEqual ∷ ∀ e. String → String → ConcreteFeature e Unit
-expectTextToEqual klass expected = (getElementText klass) >>= (expectToEqual expected)
+expectTextToEqual ∷ ∀ e. (String → ConcreteFeature e String) → String → String → ConcreteFeature e Unit
+expectTextToEqual getText klass expected = (getText klass) >>= (expectToEqual expected)
 
 
 expectToEqual ∷ ∀ e. String → String → ConcreteFeature e Unit
@@ -65,8 +76,8 @@ expectCompare f a b | (f $ (trim a) ≡ (trim b))     = pure unit
 
   where makeError = throwError $ error $ errorMessage ⊕ findDifference
         errorMessage = "Expected comparison of " ⊕ (show a) ⊕ " and " ⊕ (show b) ⊕ " to be true. Difference being: "
-        findDifference |  f $ (length a') ≡ (length b') = (show $ fst compareStrings) ⊕ " and " ⊕ (show $ snd compareStrings)
-                       | otherwise = "one string is longer difference is:" ⊕ (fromMaybe "not there" (stripPrefix (Pattern b) a))
+        findDifference = (show $ fst compareStrings) ⊕ " and " ⊕ (show $ snd compareStrings)
+                       -- | otherwise = "one string is longer difference is:" ⊕ (fromMaybe "not there" (stripPrefix (Pattern a) b))
         compareStrings = unzip $ dropWhile shouldDrop $ zip a' b'
         shouldDrop ∷ Tuple Char Char → Boolean
         shouldDrop tuple = compareWith (fst tuple) (snd tuple)

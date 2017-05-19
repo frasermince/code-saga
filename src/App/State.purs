@@ -54,9 +54,21 @@ instance showState ∷ Show State where show = genericShow
 defaultSlides ∷ Array PreFetchSlide
 defaultSlides =
   [
-    PreFetchSlide {fileName: "MultiplyMeApi/app/controllers/api/v1/accounts_controller.rb", lineNumber: 1, annotation: "HI"}
-  , PreFetchSlide {fileName: "MultiplyMeApi/app/controllers/api/v1/donations_controller.rb", lineNumber: 1, annotation: "HI"}
-  , PreFetchSlide {fileName: "MultiplyMeApi/app/controllers/api/v1/organizations_controller.rb", lineNumber: 1, annotation: "HI"}
+    PreFetchSlide
+      { fileName: "MultiplyMeApi/app/controllers/api/v1/leader_board_controller.rb"
+      , lineNumber: 27
+      , annotation: "first annotation"
+      }
+  , PreFetchSlide
+      { fileName: "MultiplyMeApi/app/controllers/api/v1/donations_controller.rb"
+      , lineNumber: 18
+      , annotation: "second annotation"
+      }
+  , PreFetchSlide
+      { fileName: "MultiplyMeApi/app/controllers/api/v1/organizations_controller.rb"
+      , lineNumber: 1
+      , annotation: "third annotation"
+      }
   ]
 transform ∷ ∀ e. Array PreFetchSlide → Eff (exception ∷ EXCEPTION, fs ∷ FS | e) (Array SlideData)
 transform prefetch = foldl toSlideData (pure []) prefetch
