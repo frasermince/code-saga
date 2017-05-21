@@ -60,7 +60,7 @@ defaultSlides =
       , annotation: "first annotation"
       }
   , PreFetchSlide
-      { fileName: "MultiplyMeApi/app/controllers/api/v1/donations_controller.rb"
+      { fileName: "MultiplyMeApi/app/services/referral_code_service.rb"
       , lineNumber: 18
       , annotation: "second annotation"
       }
