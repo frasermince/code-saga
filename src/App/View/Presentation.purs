@@ -12,14 +12,16 @@ import App.Events (Event(..))
 import CSS.TextAlign (leftTextAlign, textAlign)
 import Highlighter (codeField)
 import CSS (CSS, fromString, (?), fontSize, display, marginTop, marginRight, marginLeft, px, key, backgroundColor, padding, borderRadius, grid, height, pct, border, solid, graytone, white, width, boxSizing, borderBox)
+import CSS.Overflow (overflow, scroll)
+import CSS.Display (floatLeft, float)
 import CSS.Geometry (lineHeight)
 import CSS.Border (borderBottom)
 import CSS.Common(auto)
 
 view ∷ SlideData → HTML Event
 view (SlideData s) = do
+  style css
   div ! Att.style presentation ! className "presentation" $ do
-    style css
 
     div ! Att.style file ! className "file" $ do
       div ! Att.style header ! className "file-header" $ text $ s.fileName
@@ -38,15 +40,20 @@ css = do
     textAlign leftTextAlign
     backgroundColor white
 
+previous ∷ CSS
+previous = do
+  float floatLeft
+
 presentation ∷ CSS
 presentation = do
   marginLeft auto
   marginRight auto
   width $ px 980.0
   display grid
-  key (fromString "grid-template-rows") "1fr 1fr"
+  key (fromString "grid-template-rows") "60% 40%"
+  key (fromString "grid-template-columns") "1fr"
   key (fromString "grid-gap") "10px"
-  height $ pct 100.0
+  height $ pct 99.0
 
 content ∷ CSS
 content = do
@@ -59,11 +66,15 @@ annotation = do
   codeBorder
   fontSize $ px 16.0
   key (fromString "grid-row") "2 / 3"
+  key (fromString "grid-column") "1 / 2"
+  overflow scroll
 
 file ∷ CSS
 file = do
   key (fromString "grid-row") "1 / 2"
+  key (fromString "grid-column") "1 / 2"
   codeBorder
+  overflow scroll
 
 header ∷ CSS
 header = do
