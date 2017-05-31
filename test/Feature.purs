@@ -28,7 +28,7 @@ type ConcreteEffects eff = FeatureEffects
   ( console ∷ Ec.CONSOLE
   , dom ∷ DOM
   , ref ∷ REF
-  , selenium ∷ SELENIUM -- last
+  , selenium ∷ SELENIUM
   | eff)
 
 type TestEffects = ConcreteEffects

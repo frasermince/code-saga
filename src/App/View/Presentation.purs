@@ -5,18 +5,19 @@ import App.State (SlideData(..))
 import Pux.DOM.HTML (HTML, style)
 import Pux.DOM.HTML.Attributes as Att
 import Pux.DOM.Events (onClick)
-import Text.Smolder.HTML (div, button)
+import Text.Smolder.HTML (div, button, pre, code)
 import Text.Smolder.Markup ((!), text, (#!))
 import Text.Smolder.HTML.Attributes (className)
 import App.Events (Event(..))
 import CSS.TextAlign (leftTextAlign, textAlign)
 import Highlighter (codeField)
-import CSS (CSS, fromString, (?), fontSize, display, marginTop, marginRight, marginLeft, px, key, backgroundColor, padding, borderRadius, grid, height, pct, border, solid, graytone, white, width, boxSizing, borderBox)
-import CSS.Overflow (overflow, scroll)
+import CSS (CSS, fromString, (?), fontSize, display, marginTop, marginRight, marginLeft, px, key, backgroundColor, padding, borderRadius, grid, height, pct, border, solid, graytone, white, width, boxSizing, borderBox, flex)
+import CSS.Overflow (overflow, scroll, overflowY)
 import CSS.Display (floatLeft, float)
 import CSS.Geometry (lineHeight)
 import CSS.Border (borderBottom)
-import CSS.Common(auto)
+import CSS.Common (auto)
+import CSS.Flexbox (flexDirection, column)
 
 view ∷ SlideData → HTML Event
 view (SlideData s) = do
@@ -25,7 +26,8 @@ view (SlideData s) = do
 
     div ! Att.style file ! className "file" $ do
       div ! Att.style header ! className "file-header" $ text $ s.fileName
-      codeField {content: s.content} (text "")-- $ pre $ code ! className "presentation-code" $ text s.content
+      -- codeField {content: s.content} (text "")
+      pre $ code ! className "presentation-code" $ text s.content
     div ! Att.style annotation ! className "annotation" $ do
       div ! Att.style header $ do
         button ! className "previous" #! onClick PreviousSlide $ text "previous"
@@ -39,6 +41,8 @@ css = do
     marginTop (px 0.0)
     textAlign leftTextAlign
     backgroundColor white
+    overflowY scroll
+    -- height $ pct 45.0
 
 previous ∷ CSS
 previous = do
@@ -57,24 +61,29 @@ presentation = do
 
 content ∷ CSS
 content = do
-  padding (px 45.0) (px 45.0) (px 45.0) (px 45.0) 
+  padding (px 25.0) (px 45.0) (px 45.0) (px 25.0) 
   boxSizing borderBox
+  -- height $ pct 83.0
+  overflowY scroll
 
 annotation ∷ CSS
 annotation = do
-  height $ pct 100.0
-  codeBorder
+  -- height $ pct 100.0
   fontSize $ px 16.0
   key (fromString "grid-row") "2 / 3"
-  key (fromString "grid-column") "1 / 2"
-  overflow scroll
+  container
 
 file ∷ CSS
 file = do
   key (fromString "grid-row") "1 / 2"
-  key (fromString "grid-column") "1 / 2"
+  container
+
+container ∷ CSS
+container = do
   codeBorder
-  overflow scroll
+  display flex
+  flexDirection column
+  key (fromString "grid-column") "1 / 2"
 
 header ∷ CSS
 header = do
