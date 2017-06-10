@@ -63,8 +63,8 @@ tests = do
   testScenarioWithOpen (openSlide 1) closeSite "The correct slide should show the code from the file associated with it and the annotation" ["Reason"] do
     foldl compareSlide (pure unit) defaultSlides
 
-compareSlide ∷ ∀ e. ConcreteFeature e Unit → PreFetchSlide → ConcreteFeature e Unit
-compareSlide accum (PreFetchSlide s) = accum
+compareSlide ∷ ∀ e. ConcreteFeature e Unit → SlideData → ConcreteFeature e Unit
+compareSlide accum (SlideData s) = accum
                                        *> readFromSlideFile
                                        *> expectTextToEqual getElementText "content" s.annotation
                                        *> clickElement "next"

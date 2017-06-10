@@ -4,7 +4,7 @@ import Prelude
 import App.Events (Event(..), foldp)
 import App.Effects (AppEffects)
 import App.Routes (Route(..), match)
-import App.State (State(..),  initWithSlides, defaultSlides, PreFetchSlide(..), transform)
+import App.State (State(..),  initWithSlides, defaultSlides, SlideData(..), transform)
 import App.View.HTMLWrapper (htmlWrapper)
 import App.View.Layout (view)
 import Control.IxMonad (ibind)
@@ -41,7 +41,7 @@ appHandler
   => Request req m
   => Response res m b
   => ResponseWritable b m String
-  => Array PreFetchSlide →
+  => Array SlideData →
      Middleware
      m
      (Conn req (res StatusLineOpen) c)
@@ -51,12 +51,12 @@ appHandler slides = do
   request ← getRequestData
 
   let prefetch = if (null slides) then defaultSlides else slides
-  slideContents ← lift' $ liftEff $ transform prefetch
+  -- slideContents ← lift' $ liftEff $ transform prefetch
 
   -- slideContents ← liftEff $ _.slides $ unwrap $ state
 
   app ← liftEff $ start
-    { initialState: initWithSlides request.url slideContents
+    { initialState: initWithSlides request.url prefetch
     , view
     , foldp
     , inputs: [constant (PageView (match request.url))]
@@ -83,7 +83,7 @@ appHandler slides = do
 -- | Starts server (for development).
 main :: Eff (CoreEffects (AppEffects (buffer :: BUFFER, fs :: FS, http :: HTTP, console :: CONSOLE, process :: PROCESS))) Unit
 main = testMain []
-testMain :: ∀ e. Array PreFetchSlide → Eff (CoreEffects (AppEffects (buffer :: BUFFER, fs :: FS, http :: HTTP, console :: CONSOLE, process :: PROCESS | e))) Unit
+testMain :: ∀ e. Array SlideData → Eff (CoreEffects (AppEffects (buffer :: BUFFER, fs :: FS, http :: HTTP, console :: CONSOLE, process :: PROCESS | e))) Unit
 testMain slides = do
   port <- (fromMaybe 0 <<< fromString <<< fromMaybe "3000") <$> lookupEnv "PORT"
   let app = fileServer "static" $ appHandler slides
