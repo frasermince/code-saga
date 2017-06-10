@@ -60,13 +60,13 @@ tests = do
   testScenarioWithOpen (openSlide 5) closeSite "Going To Invalid Url Should Redirect To Not Found" [] do
     expectElementNotPresent "next"
 
-  testScenarioWithOpen (openSlide 1) closeSite "The correct slide should show the code from the file associated with it and the annotation" [] do
+  testScenarioWithOpen (openSlide 1) closeSite "The correct slide should show the code from the file associated with it and the annotation" ["Reason"] do
     foldl compareSlide (pure unit) defaultSlides
 
 compareSlide ∷ ∀ e. ConcreteFeature e Unit → PreFetchSlide → ConcreteFeature e Unit
 compareSlide accum (PreFetchSlide s) = accum
                                        *> readFromSlideFile
-                                       *> expectTextToEqual getElementText "presentation-annotation" s.annotation
+                                       *> expectTextToEqual getElementText "content" s.annotation
                                        *> clickElement "next"
   where readFromSlideFile ∷ ∀ e. ConcreteFeature e Unit
         readFromSlideFile = do

@@ -91,7 +91,7 @@ const config = {
 // If this file is directly run with node, start the development server
 // instead of exporting the webpack config.
 if (require.main === module) {
-  const compiler = webpack(require('./webpack.config.server.js'))
+  const compiler = webpack(require('./webpack.config.server.js'));
   const client = webpack(config);
   let server = null;
   const app = require('express')();
@@ -107,21 +107,22 @@ if (require.main === module) {
   app.use(require('webpack-hot-middleware')(client));
   app.listen(8080);
 
-  console.log('Compiling...')
+  console.log('Compiling...');
 
   compiler.watch({
     aggregateTimeout: 300,
-    poll: undefined
+    poll: 1000
   }, (err, stats) => {
-    if (err) return console.error(err)
+    console.log("HERE");
+    if (err) return console.error("***ERROR: ",err);
 
     if (server && !stats.hasErrors()) {
-      server.kill('SIGKILL')
+      server.kill('SIGKILL');
       server = spawn('node', ['./dist/server.js']);
     } else {
       server = spawn('node', ['./dist/server.js']);
     }
-  })
+  });
 } else {
-  module.exports = config
+  module.exports = config;
 }
