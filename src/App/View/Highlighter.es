@@ -9,8 +9,16 @@ exports.highlightClass = class HighlightClass extends React.Component{
   render(){
     const codeString = '(num) => num + 1';
     return React.createElement(SyntaxHighlighter, {
-      showLineNumbers: true,
+      wrapLines: true,
       language: 'ruby',
+      showLineNumbers: true,
+      lineStyle: ((lineNumber) => {
+        let style = { display: 'block' };
+        if(lineNumber === this.props.lineNumber){
+          style.backgroundColor = '#dbffdb';
+        }
+        return style;
+      }),
       style: githubGist
     }, this.props.content);
   }
