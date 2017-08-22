@@ -1,10 +1,13 @@
 module Server where
 
 import Prelude
+import App.Prelude
+import Debug.Trace
 import App.Events (Event(..), foldp)
 import App.Effects (AppEffects)
 import App.Routes (Route(..), match)
-import App.State (State(..),  initWithSlides, defaultSlides, SlideData(..), transform)
+import App.State (State(..),  initWithSlides, SlideData(..), transform)
+import App.MultiplyMePresentation (presentation)
 import App.View.HTMLWrapper (htmlWrapper)
 import App.View.Layout (view)
 import Control.IxMonad (ibind)
@@ -12,6 +15,7 @@ import Control.Monad.Aff.Class (liftAff, class MonadAff)
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Class (liftEff, class MonadEff)
 import Control.Monad.Eff.Console (CONSOLE)
+import Data.String (length)
 import Data.Int (fromString)
 import Data.Foreign.Generic (defaultOptions, genericEncodeJSON)
 import Data.Maybe (fromMaybe)
@@ -50,7 +54,7 @@ appHandler
 appHandler slides = do
   request ← getRequestData
 
-  let prefetch = if (null slides) then defaultSlides else slides
+  let prefetch = if (null slides) then presentation else slides
   -- slideContents ← lift' $ liftEff $ transform prefetch
 
   -- slideContents ← liftEff $ _.slides $ unwrap $ state
@@ -77,7 +81,7 @@ appHandler slides = do
   app_html <- lift' $ liftEff $ renderToString app.markup
   html <- lift' $ liftEff $ renderToStaticMarkup $ constant (htmlWrapper app_html state_json)
 
-  respond html
+  trace ("Size of string: " ⊕ (show $ length html)) (\_ → respond html)
   where bind = ibind
 
 -- | Starts server (for development).

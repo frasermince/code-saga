@@ -3,7 +3,7 @@ module Client where
 import App.Effects (AppEffects)
 import App.Events (Event(..), foldp)
 import App.Routes (match)
-import App.State (State, defaultSlides, initWithSlides)
+import App.State (State, initWithSlides)
 import App.View.Layout (view)
 import Control.Applicative (pure)
 import Control.Bind ((=<<), discard, bind)
