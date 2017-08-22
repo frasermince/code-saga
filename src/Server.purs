@@ -2,7 +2,6 @@ module Server where
 
 import Prelude
 import App.Prelude
-import Debug.Trace
 import App.Events (Event(..), foldp)
 import App.Effects (AppEffects)
 import App.Routes (Route(..), match)
@@ -81,7 +80,7 @@ appHandler slides = do
   app_html <- lift' $ liftEff $ renderToString app.markup
   html <- lift' $ liftEff $ renderToStaticMarkup $ constant (htmlWrapper app_html state_json)
 
-  trace ("Size of string: " ⊕ (show $ length html)) (\_ → respond html)
+  respond html
   where bind = ibind
 
 -- | Starts server (for development).
