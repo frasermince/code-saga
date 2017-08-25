@@ -2,16 +2,18 @@ module Test.Interaction where
 
 import Prelude
 import App.Prelude
+import Data.Array                  (foldl)
 import Selenium.Monad              (findElement, byClassName, getText, clickEl, byXPath)
 import Selenium.Types              (Element)
 import Test.Feature                (ConcreteFeature)
 import Data.Maybe                  (Maybe(..), fromMaybe)
 import Control.Monad.Error.Class   (throwError)
 import Control.Monad.Eff.Exception (error)
-import Data.String (toCharArray, stripPrefix, Pattern(..), trim)
-import Data.Array (length, unzip, zip, dropWhile)
-import Data.Tuple (fst, snd, Tuple)
-import Data.Char (toCharCode)
+import Data.String                 (toCharArray, stripPrefix, Pattern(..), trim)
+import Data.Array                  (length, unzip, zip, dropWhile)
+import Data.Tuple                  (fst, snd, Tuple)
+import Data.Char                   (toCharCode)
+import Data.String.Utils           (lines)
 
 clickElement ∷ ∀ e. String → ConcreteFeature e Unit
 clickElement className = do
@@ -70,9 +72,14 @@ expectToEqual = expectCompare id
 expectToNotEqual ∷ ∀ e. String → String → ConcreteFeature e Unit
 expectToNotEqual = expectCompare (not)
 
+
+trimByLine content = foldl trimLine "" (lines content)
+                     where trimLine accum "" = accum
+                           trimLine accum current  = accum ⊕ (trim current) ⊕ "\n"
+
 expectCompare ∷ ∀ e. (Boolean → Boolean) → String → String → ConcreteFeature e Unit
-expectCompare f a b | (f $ (trim a) ≡ (trim b))     = pure unit
-                    | otherwise = makeError
+expectCompare f a b | (f $ (trimByLine a) ≡ (trimByLine b)) = pure unit
+                    | otherwise                             = makeError
 
   where makeError = throwError $ error $ errorMessage ⊕ findDifference
         errorMessage = "Expected comparison of " ⊕ (show a) ⊕ " and " ⊕ (show b) ⊕ " to be true. Difference being: "

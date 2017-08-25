@@ -33,7 +33,7 @@ import App.MultiplyMePresentation (presentation)
 import App.State (SlideData(..), PreFetchSlide(..))
 
 
-codeSelector =  "//div[@class=\"presentation\"]//code"
+codeSelector =  "//div[@class=\"presentation\"]//code[2]"
 tests ∷ ∀ e. ConcreteFeature e Unit
 tests = do
   testScenario closeSite "View First Slide Of Code" [] do
