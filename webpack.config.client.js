@@ -113,8 +113,7 @@ if (require.main === module) {
     aggregateTimeout: 300,
     poll: 1000
   }, (err, stats) => {
-    console.log("HERE");
-    if (err) return console.error("***ERROR: ",err);
+    if (err) return console.error("***ERROR: ", err);
 
     if (server && !stats.hasErrors()) {
       server.kill('SIGKILL');
@@ -122,6 +121,18 @@ if (require.main === module) {
     } else {
       server = spawn('node', ['./dist/server.js']);
     }
+    server.stdout.on('data', function(data) {
+      console.log('stdout: ' + data);
+      //Here is where the output goes
+    });
+    server.stderr.on('data', function(data) {
+      console.log('stderr: ' + data);
+      //Here is where the error output goes
+    });
+    server.on('close', function(code) {
+      console.log('closing code: ' + code);
+      //Here you can get the exit code of the script
+    });
   });
 } else {
   module.exports = config;
