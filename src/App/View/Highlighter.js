@@ -12,8 +12,12 @@ exports.highlightClass = createReactClass({
       wrapLines: true,
       language: 'ruby',
       showLineNumbers: true,
+      codeTagProps: {style: {paddingTop: "10px", display: 'block', overflowY: 'scroll'}},
+      lineNumberContainerStyle: { textAlign: 'right',  padding: '10px', float: 'left', backgroundColor: '#fafafa', boxSizing: 'border-box', width: '38px' },
+      lineNumberStyle: { color: 'rgba(0,0,0,0.3)', fontSize: '12px', lineHeight: '19px' },
+      customStyle: { marginBottom: 0, marginLeft: 0, padding: 0, boxSizing: 'border-box' },
       lineStyle: function (lineNumber) {
-        var style = { display: 'block' };
+        var style = { display: 'block', paddingLeft: '10px', width: '100%', minHeight: '19px'};
         if (lineNumber === highlightedLineNumber) {
           style.backgroundColor = '#dbffdb';
         }

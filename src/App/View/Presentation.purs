@@ -11,7 +11,7 @@ import Text.Smolder.HTML.Attributes (className)
 import App.Events (Event(..))
 import CSS.TextAlign (leftTextAlign, textAlign)
 import Highlighter (codeField)
-import CSS (CSS, fromString, (?), fontSize, display, marginTop, marginRight, marginLeft, px, key, backgroundColor, padding, borderRadius, grid, height, pct, border, solid, graytone, white, width, boxSizing, borderBox, flex)
+import CSS (CSS, fromString, (?), fontSize, display, marginTop, marginRight, marginLeft, px, key, backgroundColor, padding, borderRadius, grid, height, pct, border, solid, graytone, white, width, boxSizing, borderBox, flex, rgb)
 import CSS.Overflow (overflow, scroll, overflowY)
 import CSS.Display (floatLeft, float)
 import CSS.Geometry (lineHeight)
@@ -41,7 +41,6 @@ css = do
     marginTop (px 0.0)
     textAlign leftTextAlign
     backgroundColor white
-    overflowY scroll
     -- height $ pct 45.0
 
 previous ∷ CSS
@@ -52,7 +51,7 @@ presentation ∷ CSS
 presentation = do
   marginLeft auto
   marginRight auto
-  width $ px 980.0
+  width $ pct 90.0
   display grid
   key (fromString "grid-template-rows") "60% 40%"
   key (fromString "grid-template-columns") "1fr"
@@ -87,11 +86,11 @@ container = do
 
 header ∷ CSS
 header = do
-  borderBottom solid (px 1.0) (graytone 0.75)
+  borderBottom solid (px 1.0) (rgb 229 229 229)
   padding (px 5.0) (px 10.0) (px 5.0) (px 10.0)
   lineHeight (px 32.0)
   height (px 32.0)
-  backgroundColor $ graytone 0.97
+  backgroundColor $ (rgb 250 250 250)
   fontSize $ px 14.0
 
 codeBorder ∷ CSS
