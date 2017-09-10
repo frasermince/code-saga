@@ -12,12 +12,12 @@ exports.highlightClass = createReactClass({
       wrapLines: true,
       language: 'ruby',
       showLineNumbers: true,
-      codeTagProps: {style: {paddingTop: "10px", display: 'block', overflowY: 'scroll'}},
-      lineNumberContainerStyle: { textAlign: 'right',  padding: '10px', float: 'left', backgroundColor: '#fafafa', boxSizing: 'border-box', width: '38px' },
-      lineNumberStyle: { color: 'rgba(0,0,0,0.3)', fontSize: '12px', lineHeight: '19px' },
-      customStyle: { marginBottom: 0, marginLeft: 0, padding: 0, boxSizing: 'border-box' },
+      codeTagProps: {style: {paddingTop: "10px", display: 'block', float: 'left', width: '1200px' }},
+      lineNumberContainerStyle: { textAlign: 'right',  padding: '10px', float: 'left', backgroundColor: '#fafafa', boxSizing: 'border-box' },
+      lineNumberStyle: { color: 'rgba(0,0,0,0.3)', fontSize: '12px', lineHeight: '19px', width: '38px', display: 'block' },
+      customStyle: { marginBottom: 0, marginLeft: 0, padding: 0, boxSizing: 'border-box', height: '100%' },
       lineStyle: function (lineNumber) {
-        var style = { display: 'block', paddingLeft: '10px', width: '100%', minHeight: '19px'};
+        var style = { display: 'inline-block', paddingLeft: '10px', paddingRight: '10px', width: 'auto', minHeight: '19px', clear: 'both', float: 'left'};
         if (lineNumber === highlightedLineNumber) {
           style.backgroundColor = '#dbffdb';
         }
