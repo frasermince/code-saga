@@ -5,13 +5,13 @@ import App.State (SlideData(..))
 import Pux.DOM.HTML (HTML, style)
 import Pux.DOM.HTML.Attributes as Att
 import Pux.DOM.Events (onClick)
-import Text.Smolder.HTML (div, button, pre, code)
+import Text.Smolder.HTML (div, button, pre, code, strong)
 import Text.Smolder.Markup ((!), text, (#!))
 import Text.Smolder.HTML.Attributes (className)
 import App.Events (Event(..))
 import CSS.TextAlign (leftTextAlign, textAlign)
 import Highlighter (codeField)
-import CSS (CSS, fromString, (?), fontSize, display, marginTop, marginRight, marginLeft, px, key, backgroundColor, padding, borderRadius, grid, height, pct, border, solid, graytone, white, width, boxSizing, borderBox, flex, rgb)
+import CSS (CSS, fromString, (?), fontSize, display, marginTop, marginRight, marginLeft, px, key, backgroundColor, padding, borderRadius, grid, height, pct, border, solid, graytone, white, width, boxSizing, borderBox, flex, rgb, paddingLeft)
 import CSS.Overflow (overflow, scroll, overflowY)
 import CSS.Display (floatLeft, float)
 import CSS.Geometry (lineHeight)
@@ -25,7 +25,7 @@ view (SlideData s) = do
   div ! Att.style presentation ! className "presentation" $ do
 
     div ! Att.style file ! className "file" $ do
-      div ! Att.style header ! className "file-header" $ text $ s.fileName
+      div ! Att.style header ! className "file-header" $ strong ! Att.style fileName $ text $ s.fileName
       codeField {content: s.content, lineNumber: s.lineNumber} (text "")
       -- pre $ code ! className "presentation-code" $ text s.content
     div ! Att.style annotation ! className "annotation" $ do
@@ -38,7 +38,6 @@ view (SlideData s) = do
 css ∷ CSS
 css = do
   fromString ".presentation pre" ? do
-    marginTop (px 0.0)
     textAlign leftTextAlign
     backgroundColor white
     -- height $ pct 45.0
@@ -46,6 +45,10 @@ css = do
 previous ∷ CSS
 previous = do
   float floatLeft
+
+fileName ∷ CSS
+fileName =  do
+  paddingLeft $ px 58.0
 
 presentation ∷ CSS
 presentation = do

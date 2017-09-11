@@ -8,7 +8,8 @@ presentation ∷ Array SlideData
 presentation =
   [
     SlideData
-      { fileName: "MultiplyMeApi/app/controllers/api/v1/leader_board_controller.rb"
+      { fileName: "leader_board_controller.rb"
+      , filePath: "app/controllers/api/v1/"
       , lineNumber: 8
       , annotation: "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec hendrerit tempor tellus. Donec pretium posuere tellus. Proin quam nisl, tincidunt et, mattis eget, convallis nec, purus. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nulla posuere. Donec vitae dolor. Nullam tristique diam non turpis. Cras placerat accumsan nulla. Nullam rutrum. Nam vestibulum accumsan nisl.orem ipsum dolor sit amet, consectetuer adipiscing elit. Donec hendrerit tempor tellus. Donec pretium posuere tellus. Proin quam nisl, tincidunt et, mattis eget, convallis nec, purus. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nulla posuere. Donec vitae dolor. Nullam tristique diam non turpis. Cras placerat accumsan nulla. Nullam rutrum. Nam vestibulum accumsan nisl.orem ipsum dolor sit amet, consectetuer adipiscing elit. Donec hendrerit tempor tellus. Donec pretium posuere tellus. Proin quam nisl, tincidunt et, mattis eget, convallis nec, purus. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nulla posuere. Donec vitae dolor. Nullam tristique diam non turpis. Cras placerat accumsan nulla. Nullam rutrum. Nam vestibulum accumsan nisl.orem ipsum dolor sit amet, consectetuer adipiscing elit. Donec hendrerit tempor tellus. Donec pretium posuere tellus. Proin quam nisl, tincidunt et, mattis eget, convallis nec, purus. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nulla posuere. Donec vitae dolor. Nullam tristique diam non turpis. Cras placerat accumsan nulla. Nullam rutrum. Nam vestibulum accumsan nisl.orem ipsum dolor sit amet, consectetuer adipiscing elit. Donec hendrerit tempor tellus. Donec pretium posuere tellus. Proin quam nisl, tincidunt et, mattis eget, convallis nec, purus. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nulla posuere. Donec vitae dolor. Nullam tristique diam non turpis. Cras placerat accumsan nulla. Nullam rutrum. Nam vestibulum accumsan nisl.orem ipsum dolor sit amet, consectetuer adipiscing elit. Donec hendrerit tempor tellus. Donec pretium posuere tellus. Proin quam nisl, tincidunt et, mattis eget, convallis nec, purus. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nulla posuere. Donec vitae dolor. Nullam tristique diam non turpis. Cras placerat accumsan nulla. Nullam rutrum. Nam vestibulum accumsan nisl."
       , content: "\
@@ -19,7 +20,7 @@ presentation =
 \      def index\n\
 \        limit = params[:limit].nil? ? 10 : params[:limit]\n\
 \        @leaders = get_leaders limit\n\
-\                                                                                                                                   render json: {leaders: @leaders}, status: :ok, methods: :contribution\n\
+\                                                                                                                                                                                     render json: {leaders: @leaders}, status: :ok, methods: :contribution\n\
 \      end\n\
 \\n\
 \      private\n\
@@ -38,7 +39,8 @@ presentation =
 
       }
   , SlideData
-      { fileName: "MultiplyMeApi/app/services/referral_code_service.rb"
+      { fileName: "referral_code_service.rb"
+      , filePath: "app/services/"
       , lineNumber: 18
       , annotation: "second annotation"
       , content: "\
@@ -70,7 +72,8 @@ presentation =
 \end"
       }
   , SlideData
-      { fileName: "MultiplyMeApi/app/controllers/api/v1/organizations_controller.rb"
+      { fileName: "organizations_controller.rb"
+      , filePath: "app/controllers/api/v1/"
       , lineNumber: 1
       , annotation: "third annotation"
       , content: "\

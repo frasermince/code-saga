@@ -22,6 +22,7 @@ import Data.Newtype (wrap)
 
 newtype SlideData = SlideData
   { fileName ∷ String
+  , filePath ∷ String
   , lineNumber ∷ Int
   , annotation ∷ String
   , content ∷ String
@@ -36,6 +37,7 @@ instance showSlide ∷ Show SlideData where show = genericShow
 
 newtype PreFetchSlide = PreFetchSlide
   { fileName ∷ String
+  , filePath ∷ String
   , lineNumber ∷ Int
   , annotation ∷ String
   }
@@ -55,8 +57,8 @@ transform ∷ ∀ e. Array PreFetchSlide → Eff (exception ∷ EXCEPTION, fs �
 transform prefetch = foldl toSlideData (pure []) prefetch
   where toSlideData accum (PreFetchSlide p) = snoc <$> accum <*> (fetchSlide p)
         fetchSlide p = (makeSlide p) <$> readTextFile UTF8 p.fileName
-        makeSlide {fileName: fileName, lineNumber: lineNumber, annotation: annotation} content =
-          SlideData {fileName: fileName, lineNumber: lineNumber, annotation: annotation, content: content}
+        makeSlide {fileName: fileName, filePath: filePath, lineNumber: lineNumber, annotation: annotation} content =
+          SlideData {fileName: fileName, filePath: filePath, lineNumber: lineNumber, annotation: annotation, content: content}
 
 
 initWithSlides ∷ String → Array SlideData → State
