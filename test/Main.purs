@@ -71,7 +71,7 @@ compareSlide accum (SlideData s) = accum
                                        *> clickElement "next"
   where readFromSlideFile ∷ ∀ e. ConcreteFeature e Unit
         readFromSlideFile = do
-          text ← liftEff $ readTextFile UTF8 s.fileName
+          text ← liftEff $ readTextFile UTF8 $ s.filePath ⊕ s.fileName
           expectTextToEqual getElementTextByXPath codeSelector text
 
 openSlide ∷ ∀ e. Int → ConcreteFeature e Unit
@@ -82,9 +82,9 @@ openSlide number = get $ "http://localhost:3000/presentation/project_name/" ⊕ 
 testSlides ∷ Array PreFetchSlide
 testSlides =
   [
-    PreFetchSlide {fileName: "MultiplyMeApi/app/controllers/api/v1/leader_board_controller.rb", lineNumber: 1, annotation: "HI"}
-  , PreFetchSlide {fileName: "MultiplyMeApi/app/controllers/api/v1/donations_controller.rb", lineNumber: 1, annotation: "HI"}
-  , PreFetchSlide {fileName: "MultiplyMeApi/app/controllers/api/v1/organizations_controller.rb", lineNumber: 1, annotation: "HI"}
+    PreFetchSlide {filePath: "MultiplyMeApi/app/controllers/api/v1/", fileName: "leader_board_controller.rb", lineNumber: 1, annotation: "HI"}
+  , PreFetchSlide {filePath: "MultiplyMeApi/app/controllers/api/v1/", fileName: "donations_controller.rb", lineNumber: 1, annotation: "HI"}
+  , PreFetchSlide {filePath: "MultiplyMeApi/app/controllers/api/v1/", fileName: "organizations_controller.rb", lineNumber: 1, annotation: "HI"}
   ]
 -- main ∷ Eff (TestEffects) Unit
 main = do
