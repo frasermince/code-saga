@@ -61,7 +61,8 @@ const config = {
   resolve: {
     alias: {
       'react': 'preact-compat',
-      'react-dom': 'preact-compat'
+      'react-dom': 'preact-compat',
+      'create-react-class': 'preact-compat/lib/create-react-class'
     },
     modules: [
       'node_modules',
@@ -122,16 +123,16 @@ if (require.main === module) {
       server = spawn('node', ['./dist/server.js']);
     }
     server.stdout.on('data', function(data) {
+      // Here is where the output goes
       console.log('stdout: ' + data);
-      //Here is where the output goes
     });
     server.stderr.on('data', function(data) {
+      // Here is where the error output goes
       console.log('stderr: ' + data);
-      //Here is where the error output goes
     });
     server.on('close', function(code) {
+      // Here you can get the exit code of the script
       console.log('closing code: ' + code);
-      //Here you can get the exit code of the script
     });
   });
 } else {
