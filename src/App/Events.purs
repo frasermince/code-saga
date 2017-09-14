@@ -51,18 +51,17 @@ foldp (PageView (Presentation name number)) (State st) =
           w ← window
           d ← document w
           b ← body d
-          code ← maybe bodyError (findCode ∘ htmlElementToElement) b
+          pre ← maybe bodyError (findPre ∘ htmlElementToElement) b
           line ← maybe bodyError (findLine ∘ htmlElementToElement) b
           offset ← maybe (throwException $ error $ "line is not present") (elementToHTMLElement >=> offsetTop) line
-          maybe (throwException $ error $ "code block is not present") (setScrollTop offset) code
+          maybe (throwException $ error $ "code block is not present") (setScrollTop offset) pre
           pure Nothing
 
-        codeSelector = "code:nth-of-type(2)"
-        lineSelector lineNumber = (codeSelector ⊕ " > span:nth-of-type(" ⊕ (show lineNumber) ⊕ ")")
+        lineSelector lineNumber = ("code:nth-of-type(2) > span:nth-of-type(" ⊕ (show lineNumber) ⊕ ")")
         bodyError = throwException $ error $ "body is not present"
-        findCode body = do
+        findPre body = do
           let b = elementToParentNode body
-          querySelector (QuerySelector codeSelector) b
+          querySelector (QuerySelector "pre") b
         findLine body = do
           let slide = index st.slides (number - 1)
           lineNumber ← maybe (throwException $ error $ "slide is not present") (pure ∘ _.lineNumber ∘ unwrap) slide
