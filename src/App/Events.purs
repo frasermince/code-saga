@@ -19,7 +19,7 @@ import DOM.Node.Types (elementToParentNode)
 import DOM.HTML.Types (htmlElementToElement, readHTMLElement)
 import DOM.HTML.HTMLElement (offsetTop)
 import DOM.Node.NodeList (item)
-import DOM.Node.Element (setScrollTop)
+import DOM.Node.Element (setScrollTop, clientHeight)
 import Data.Array (index)
 import Data.Foreign (toForeign, renderForeignError)
 import Data.Foldable (foldl)
@@ -54,11 +54,17 @@ foldp (PageView (Presentation name number)) (State st) =
           pre ← maybe bodyError (findPre ∘ htmlElementToElement) b
           line ← maybe bodyError (findLine ∘ htmlElementToElement) b
           offset ← maybe (throwException $ error $ "line is not present") (elementToHTMLElement >=> offsetTop) line
-          maybe (throwException $ error $ "code block is not present") (setScrollTop offset) pre
+          -- let scrollDistance = offset - preHeight / 2.0
+          maybe preError (setScroll offset) pre
           pure Nothing
 
         lineSelector lineNumber = ("code:nth-of-type(2) > span:nth-of-type(" ⊕ (show lineNumber) ⊕ ")")
+        setScroll offset pre = do
+          preHeight ← clientHeight pre
+          let scrollChange = offset - preHeight / 2.0
+          setScrollTop scrollChange pre
         bodyError = throwException $ error $ "body is not present"
+        preError = throwException $ error $ "pre is not present"
         findPre body = do
           let b = elementToParentNode body
           querySelector (QuerySelector "pre") b
@@ -68,9 +74,7 @@ foldp (PageView (Presentation name number)) (State st) =
           let b = elementToParentNode body
           querySelector (QuerySelector $ lineSelector lineNumber) b
         elementAsF e = readHTMLElement $ toForeign e
-        -- forError ∷ NonEmptyList ForeignError → 
         combineErrors accum error = accum ⊕ " " ⊕ renderForeignError error
-        -- forError ∷ NonEmptyList ForeignError → 
         forError errors = throwException $ error $ foldl combineErrors "" errors
         forValue value = pure value
         elementToHTMLElement e = either forError forValue (runExcept $ elementAsF e)
