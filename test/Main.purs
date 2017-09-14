@@ -29,7 +29,7 @@ import Text.Chalky (green, red, yellow)
 import Data.Time.Duration (Milliseconds(..))
 import Test.Interaction (expectChangeOnClick, expectNoChangeOnClick, clickElement, expectToEqual, getElementText, expectTextToEqual, getElementTextByXPath)
 import Server as Server
-import App.MultiplyMePresentation (presentation)
+import App.TestPresentation (presentation)
 import App.State (SlideData(..), PreFetchSlide(..))
 
 
