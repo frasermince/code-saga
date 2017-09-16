@@ -2,21 +2,23 @@ module App.Events where
 
 import Prelude
 import App.Prelude
-import App.Effects (AppEffects)
+import App.Effects (ClientEffects)
 import App.Routes (Route(..), match, toURL)
 import App.State (State(..), SlideData(..))
 import App.Util (findSlide)
 import Control.Monad.Eff.Exception (throwException)
 import Control.Monad.Eff.Class (liftEff)
+import DOM (DOM)
 import DOM.Event.Event (preventDefault)
 import DOM.HTML (window)
 import DOM.HTML.Window (history, document)
 import DOM.HTML.History (pushState, DocumentTitle(..), URL(..))
-import Control.Monad.Eff.Exception (error)
+import Signal.Channel (CHANNEL)
+import Control.Monad.Eff.Exception (error, EXCEPTION)
 import DOM.HTML.Document (body)
 import DOM.Node.ParentNode (QuerySelector(..), querySelector)
 import DOM.Node.Types (elementToParentNode)
-import DOM.HTML.Types (htmlElementToElement, readHTMLElement)
+import DOM.HTML.Types (htmlElementToElement, readHTMLElement, HISTORY)
 import DOM.HTML.HTMLElement (offsetTop)
 import DOM.Node.NodeList (item)
 import DOM.Node.Element (setScrollTop, clientHeight)
@@ -37,47 +39,11 @@ data Event = PageView Route
            | NextSlide DOMEvent
            | Navigate String DOMEvent
 
-
--- foldp :: Event -> State -> EffModel State Event (ajax :: AJAX)
+-- foldp :: Event -> State -> EffModel State Event ClientEffects
 foldp (PageView (Presentation name number)) (State st) =
   { state: State st { route = (Presentation name number), loaded = true }
-  , effects: [ liftEff do
-      case st.loaded of
-        true → scrollToPoint
-        false → pure Nothing
-    ]
+  , effects: []
   }
-  where scrollToPoint = do
-          w ← window
-          d ← document w
-          b ← body d
-          pre ← maybe bodyError (findPre ∘ htmlElementToElement) b
-          line ← maybe bodyError (findLine ∘ htmlElementToElement) b
-          offset ← maybe (throwException $ error $ "line is not present") (elementToHTMLElement >=> offsetTop) line
-          -- let scrollDistance = offset - preHeight / 2.0
-          maybe preError (setScroll offset) pre
-          pure Nothing
-
-        lineSelector lineNumber = ("code:nth-of-type(2) > span:nth-of-type(" ⊕ (show lineNumber) ⊕ ")")
-        setScroll offset pre = do
-          preHeight ← clientHeight pre
-          let scrollChange = offset - preHeight / 2.0
-          setScrollTop scrollChange pre
-        bodyError = throwException $ error $ "body is not present"
-        preError = throwException $ error $ "pre is not present"
-        findPre body = do
-          let b = elementToParentNode body
-          querySelector (QuerySelector "pre") b
-        findLine body = do
-          let slide = index st.slides (number - 1)
-          lineNumber ← maybe (throwException $ error $ "slide is not present") (pure ∘ _.lineNumber ∘ unwrap) slide
-          let b = elementToParentNode body
-          querySelector (QuerySelector $ lineSelector lineNumber) b
-        elementAsF e = readHTMLElement $ toForeign e
-        combineErrors accum error = accum ⊕ " " ⊕ renderForeignError error
-        forError errors = throwException $ error $ foldl combineErrors "" errors
-        forValue value = pure value
-        elementToHTMLElement e = either forError forValue (runExcept $ elementAsF e)
 
 foldp (PageView route) (State st) = noEffects $ State st { route = route, loaded = true }
 
@@ -102,6 +68,7 @@ foldp (Navigate url ev) state =
     liftEff do
       preventDefault ev
       h <- history =<< window
+      preventDefault ev
       pushState (toForeign {}) (DocumentTitle "") (URL url) h
     pure $ Just $ PageView $ match url
   ]

@@ -6,6 +6,18 @@ var createReactClass = require('create-react-class');
 
 highlighter.registerLanguage('ruby', ruby.default);
 exports.highlightClass = createReactClass({
+  componentDidUpdate: function() {
+    var pre = document.querySelector('pre'),
+        line = document.querySelector('code:nth-of-type(2) > span:nth-of-type(' + this.props.lineNumber + ')'),
+        scrollDistance = line.offsetTop - pre.clientHeight / 2;
+    pre.scrollTop = scrollDistance;
+  },
+  componentDidMount: function () {
+    var pre = document.querySelector('pre'),
+        line = document.querySelector('code:nth-of-type(2) > span:nth-of-type(' + this.props.lineNumber + ')'),
+        scrollDistance = line.offsetTop - pre.clientHeight / 2;
+    pre.scrollTop = scrollDistance;
+  },
   render: function () {
     var highlightedLineNumber = this.props.lineNumber;
     return React.createElement(highlighter.default, {
