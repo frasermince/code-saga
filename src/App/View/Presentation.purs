@@ -11,12 +11,13 @@ import Text.Smolder.HTML.Attributes (className)
 import App.Events (Event(..))
 import CSS.TextAlign (leftTextAlign, textAlign)
 import Highlighter (codeField)
-import CSS (CSS, fromString, (?), fontSize, display, marginTop, marginRight, marginLeft, px, key, backgroundColor, padding, borderRadius, grid, height, pct, border, solid, graytone, white, width, boxSizing, borderBox, flex, rgb, paddingLeft)
+import CSS (CSS, fromString, (?), fontSize, display, marginTop, marginRight, marginLeft, margin, px, key, backgroundColor, padding, borderRadius, grid, height, pct, border, solid, graytone, white, width, boxSizing, borderBox, flex, rgb, paddingLeft, borderColor, rgba, color, black, rem)
 import CSS.Overflow (overflow, scroll, overflowY)
-import CSS.Display (floatLeft, float)
+import CSS.Display (floatLeft, float, floatRight)
 import CSS.Geometry (lineHeight)
-import CSS.Border (borderBottom)
+import CSS.Border (borderBottom, border)
 import CSS.Common (auto)
+import CSS.Font (FontWeight(..), fontWeight, bold)
 import CSS.Flexbox (flexDirection, column)
 
 view ∷ SlideData → HTML Event
@@ -29,11 +30,34 @@ view (SlideData s) = do
       codeField {content: s.content, lineNumber: s.lineNumber} (text "")
       -- pre $ code ! className "presentation-code" $ text s.content
     div ! Att.style annotation ! className "annotation" $ do
-      div ! Att.style header $ do
-        button ! className "previous" #! onClick PreviousSlide $ text "previous"
-        button ! className "next" #! onClick NextSlide  $ text "next"
+      div ! Att.style contentHeader $ do
+        button ! Att.style leftButton ! className "previous" #! onClick PreviousSlide $ text "Back"
+        button ! Att.style rightButton ! className "next" #! onClick NextSlide  $ text "Next"
       div ! className "content" ! Att.style content $ do
         text s.annotation
+
+buttonStyle ∷ CSS
+buttonStyle = do
+  padding (px 8.0) (px 12.0) (px 8.0) (px 12.0)
+  height $ px 32.0
+  width $ px 76.0
+  backgroundColor $ rgb 100 100 100
+  -- borderRadius (rem 0.25) (rem 0.25) (rem 0.25) (rem 0.25)
+  borderColor $ (rgb 52 58 64)
+  color $ (rgb 255 255 255)
+  fontWeight bold
+  fontSize $ rem 0.8
+  border solid (px 1.0) (rgba 0 0 0 0.0)
+
+leftButton ∷ CSS
+leftButton = do
+  buttonStyle
+  float floatLeft
+
+rightButton ∷ CSS
+rightButton = do
+  buttonStyle
+  float floatRight
 
 css ∷ CSS
 css = do
@@ -63,8 +87,11 @@ presentation = do
 
 content ∷ CSS
 content = do
+  marginLeft $ px 40.0
   padding (px 25.0) (px 45.0) (px 45.0) (px 25.0) 
   boxSizing borderBox
+  fontSize $ px 18.0
+  lineHeight $ pct 150.0
   -- height $ pct 83.0
   overflowY scroll
 
@@ -86,6 +113,12 @@ container = do
   display flex
   flexDirection column
   key (fromString "grid-column") "1 / 2"
+
+contentHeader ∷ CSS
+contentHeader = do
+  header
+  margin (px 0.0) (px 0.0) (px 0.0) (px 0.0)
+  padding (px 0.0) (px 0.0) (px 0.0) (px 0.0)
 
 header ∷ CSS
 header = do

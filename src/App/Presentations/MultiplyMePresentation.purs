@@ -760,7 +760,7 @@ presentation =
       }
 
     , SlideData
-      { fileName: "paymentService.rb"
+      { fileName: "payment_service.rb"
       , filePath: "app/services"
       , lineNumber: 1
       , annotation: "This is the service built by the factory we just saw. It is very simple and just calls pay on the strategies created by the factory."
