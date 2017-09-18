@@ -1,0 +1,16 @@
+{
+  "AWSEBDockerrunVersion": "1",
+  "Authentication": {
+    "Bucket": "elasticbeanstalk-us-west-2-819024419526",
+    "Key": "~/.docker/config.json"
+  },
+  "Image": {
+    "Name": "frasermince/codesaga",
+    "Update": "true"
+  },
+  "Ports": [
+    {
+      "ContainerPort": "3000"
+    }
+  ]
+}
