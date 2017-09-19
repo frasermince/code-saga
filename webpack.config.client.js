@@ -22,7 +22,7 @@ var plugins = [
 ]
 
 if (isProd) {
-  plugins = plugins.concat([
+  plugins = plugins.push(
     // new webpack.LoaderOptionsPlugin({
     //   minimize: true,
     //   debug: false
@@ -37,7 +37,7 @@ if (isProd) {
         comments: false,
       }
     })
-  ])
+  )
 } else {
   entries.unshift('webpack-hot-middleware/client?path=http://localhost:8080/__webpack_hmr&reload=true');
   plugins.push(

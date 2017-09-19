@@ -4,6 +4,249 @@ import Prelude
 import App.Prelude
 import App.State (SlideData(..))
 
+newFactory ="\
+\FactoryGirl.define do\n\
+\  factory :donation do\n\
+\    organization_id {Organization.first.present? ? Organization.first.id : create(:organization).id}\n\
+\    user_id {User.first.present? ? User.first.id : create(:user).id}\n\
+\    amount 300\n\
+\\n\
+\    factory :stripe_donation do\n\
+\      is_paid true\n\
+\      is_subscription true\n\
+\      factory :unpaid_stripe_donation do\n\
+\        is_paid false\n\
+\        is_subscription false\n\
+\      end\n\
+\      amount 10000\n\
+\      user_id {create(:stripe_user).id}\n\
+\    end\n\
+\  end\n\
+\end"
+
+factories="\
+\FactoryGirl.define do\n\
+\  factory :donation do\n\
+\    organization_id {Organization.first.present? ? Organization.first.id : create(:organization).id}\n\
+\    user_id {User.first.present? ? User.first.id : create(:user).id}\n\
+\    amount 300\n\
+\\n\
+\    factory :stripe_donation do\n\
+\      is_paid true\n\
+\      is_subscription true\n\
+\      factory :unpaid_stripe_donation do\n\
+\        is_paid false\n\
+\        is_subscription false\n\
+\      end\n\
+\      amount 10000\n\
+\      user_id {create(:stripe_user).id}\n\
+\    end\n\
+\\n\
+\    factory :first_new_user_donation do\n\
+\      id 6\n\
+\      amount 1000\n\
+\      user_id {create(:second_user).id}\n\
+\      parent_id 1\n\
+\      factory :second_new_user_donation do\n\
+\        user_id {create(:third_user).id}\n\
+\        id 3\n\
+\        parent_id 6\n\
+\      end\n\
+\      factory :third_new_user_donation do\n\
+\        user_id {create(:fourth_user).id}\n\
+\        id 4\n\
+\        parent_id 3\n\
+\      end\n\
+\    end\n\
+\\n\
+\    factory :subscription_donation do\n\
+\      is_subscription true\n\
+\      factory :nonsubscription_donation do\n\
+\        is_subscription false\n\
+\      end\n\
+\    end\n\
+\\n\
+\    factory :updated_donation do\n\
+\      amount 400\n\
+\    end\n\
+\\n\
+\    factory :parent do\n\
+\      created_at DateTime.now\n\
+\      amount 500\n\
+\      id 1\n\
+\      parent_id nil\n\
+\      factory :old_donation do\n\
+\        created_at 4.days.ago\n\
+\      end\n\
+\      factory :unchallenged_donation do\n\
+\        is_challenged false\n\
+\      end\n\
+\      factory :paid_donation do\n\
+\        is_paid true\n\
+\      end\n\
+\    end\n\
+\\n\
+\    factory :child do\n\
+\      amount 100\n\
+\      id 2\n\
+\      parent_id 1\n\
+\      factory :updated_child do\n\
+\        amount 500\n\
+\      end\n\
+\    end\n\
+\\n\
+\    factory :grandchild do\n\
+\      amount 700\n\
+\      id 3\n\
+\      parent_id 2\n\
+\      factory :updated_grandchild do\n\
+\        amount 600\n\
+\      end\n\
+\    end\n\
+\\n\
+\    factory :second_grandchild do\n\
+\      amount 400\n\
+\      id 4\n\
+\      parent_id 2\n\
+\      factory :updated_second_grandchild do\n\
+\        amount 500\n\
+\      end\n\
+\    end\n\
+\\n\
+\    factory :second_child do\n\
+\      amount 100\n\
+\      id 5\n\
+\      parent_id 1\n\
+\    end\n\
+\\n\
+\    factory :third_child do\n\
+\      amount 100\n\
+\      id 6\n\
+\      parent_id 1\n\
+\    end\n\
+\\n\
+\  end\n\
+\end"
+
+test="\
+\require 'rails_helper'\n\
+\\n\
+\RSpec.configure do |c|\n\
+\  c.include StripeHelpers\n\
+\end\n\
+\RSpec.describe StripeClient do\n\
+\\n\
+\  before(:each) do\n\
+\    @stripe_client = StripeClient.new\n\
+\  end\n\
+\\n\
+\  describe '#create_stripe_user' do\n\
+\    it 'successfully saves a stripe user' do\n\
+\      result = VCR.use_cassette('service_create_stripe_user') do\n\
+\        @stripe_client.create_stripe_user(valid_stripe_params)\n\
+\      end\n\
+\      expect(result).not_to be_falsey\n\
+\    end\n\
+\\n\
+\    it 'fails to create a stripe user' do\n\
+\      VCR.use_cassette('failed_stripe_user') do\n\
+\        expect{@stripe_client.create_stripe_user(email: 'test@test.com', token: '12345')}.to raise_error(Stripe::InvalidRequestError)\n\
+\      end\n\
+\    end\n\
+\  end\n\
+\\n\
+\  describe '#retrieve_stripe_user' do\n\
+\    context 'has a valid token' do\n\
+\      it 'successfully retrieves the stripe user' do\n\
+\        user = create(:stripe_user)\n\
+\        VCR.use_cassette('retrieve_user') do\n\
+\          expect{@stripe_client.retrieve_stripe_user user}.not_to raise_error\n\
+\        end\n\
+\      end\n\
+\    end\n\
+\    context 'has an invalid user' do\n\
+\      it 'raises an error' do\n\
+\        user = create(:user)\n\
+\        VCR.use_cassette('retrieve_invalid_user') do\n\
+\          expect{@stripe_client.retrieve_stripe_user user}.to raise_error(Stripe::InvalidRequestError)\n\
+\        end\n\
+\      end\n\
+\    end\n\
+\  end\n\
+\\n\
+\  describe '#create_credit_card' do\n\
+\    it 'successfully creates credit card' do\n\
+\\n\
+\      user = create(:stripe_user)\n\
+\      customer = fetch_stripe_user(user)\n\
+\      allow(@stripe_client)\n\
+\        .to receive(:retrieve_stripe_user)\n\
+\        .and_return(customer)\n\
+\\n\
+\      VCR.use_cassette('create_credit_card') do\n\
+\        expect{@stripe_client.create_credit_card create_token, user}.not_to raise_error\n\
+\      end\n\
+\    end\n\
+\\n\
+\    it 'fails to create credit card because token is invalid' do\n\
+\      user = create(:stripe_user)\n\
+\\n\
+\      customer = fetch_stripe_user(user)\n\
+\      allow(@stripe_client)\n\
+\        .to receive(:retrieve_stripe_user)\n\
+\        .and_return(customer)\n\
+\\n\
+\      VCR.use_cassette('create_credit_card_invalid_token') do\n\
+\        expect{@stripe_client.create_credit_card '12345', user}.to raise_error(Stripe::InvalidRequestError)\n\
+\      end\n\
+\    end\n\
+\  end\n\
+\\n\
+\  describe '#create_charge' do\n\
+\    context 'has a valid stripe id' do\n\
+\      it 'creates a charge' do\n\
+\        donation = create(:stripe_donation)\n\
+\        organization = create(:organization)\n\
+\        customer = create_stripe_user(organization)\n\
+\        stripe_client = StripeClient.new(organization)\n\
+\\n\
+\        VCR.use_cassette('create_charge') do\n\
+\          expect{stripe_client.create_charge donation, customer}\n\
+\            .not_to raise_error\n\
+\        end\n\
+\        expect(donation.reload.stripe_id).to be\n\
+\      end\n\
+\    end\n\
+\  end\n\
+\\n\
+\  describe '#create_subscription' do\n\
+\    context 'has a valid stripe id' do\n\
+\      it 'creates a subscription' do\n\
+\        donation = create(:stripe_donation)\n\
+\        organization = create(:organization)\n\
+\        stripe_client = StripeClient.new(organization)\n\
+\        customer = create_stripe_user(organization)\n\
+\        VCR.use_cassette('create_subscription') do\n\
+\          expect{stripe_client.create_subscription donation, customer}\n\
+\            .not_to raise_error\n\
+\        end\n\
+\        expect(donation.reload.stripe_id).to be\n\
+\      end\n\
+\    end\n\
+\  end\n\
+\\n\
+\  describe '#create_stripe_token' do\n\
+\    it 'creates a token' do\n\
+\      user = create(:stripe_user)\n\
+\      organization = create(:organization)\n\
+\      stripe_client = StripeClient.new(organization)\n\
+\      VCR.use_cassette('create_stripe_token_for_organizations_user') do\n\
+\        expect(stripe_client.create_stripe_token user.stripe_id).to be\n\
+\      end\n\
+\    end\n\
+\  end\n\
+\end"
+
 joinModel="\
 \class OrganizationsUser < ActiveRecord::Base\n\
 \  belongs_to :organization\n\
@@ -683,7 +926,7 @@ presentation =
       { fileName: "pledgeable.rb"
       , filePath: "app/models/concerns"
       , lineNumber: 73
-      , annotation: "The donations are handled in stripe and the logic originally also lived in the same concern. Once again this is quite messy and doesn't really belong here."
+      , annotation: "The donations are handled in Stripe and the logic originally also lived in the same concern. Once again this is quite messy and doesn't really belong here."
       , content: concern
       }
 
@@ -691,7 +934,7 @@ presentation =
       { fileName: "stripe_client.rb"
       , filePath: "app/models"
       , lineNumber: 1
-      , annotation: "I abstracted the stripe logic out to it's own separate class. This way all the stripe logic is in one file and thus this is the only place we make external calls to stripe. One concern with this approach is feature envy. Several of the methods in here use their parameters more than the class itself. However I decided the simplicity was worth code smell."
+      , annotation: "I abstracted the Stripe logic out to it's own separate class. This way all the Stripe logic is in one file and thus this is the only place we make external calls to Stripe. One concern with this approach is feature envy. Several of the methods in here use their parameters more than the class itself. However I decided the simplicity was worth code smell."
       , content: stripe
       }
 
@@ -755,7 +998,7 @@ presentation =
       { fileName: "one_time_payment.rb"
       , filePath: "app/models/payments"
       , lineNumber: 1
-      , annotation: "This is an example of one of the strategies built by the payment_factory. All payment strategies implement a pay method that charge stripe in various ways."
+      , annotation: "This is an example of one of the strategies built by the payment_factory. All payment strategies implement a pay method that charge Stripe in various ways."
       , content: strategy
       }
 
@@ -781,5 +1024,45 @@ presentation =
       , lineNumber: 16
       , annotation: "First I moved several of these methods to OrganizationUser to fix the feature envy. I then refactored them to just call the previously mentioned StripeClient. This made the logic much simpler and helped me not repeat myself."
       , content: joinModel
+      }
+
+    , SlideData
+      { fileName: "stripe_client_spec.rb"
+      , filePath: "spec/models"
+      , lineNumber: 31
+      , annotation: "I also wanted an easy way to speed up tests while still keeping the original behavior. Especially with code that was calling out to Stripe. I decided to use VCR to record the result of the call the first time and after that just use those recordings. Here is an example of me using VCR."
+      , content: test
+      }
+
+    , SlideData
+      { fileName: "donation.rb"
+      , filePath: "spec/factories"
+      , lineNumber: 1
+      , annotation: "I also had a lot of donation factories originally. I decided this constituted a mystery guest."
+      , content: factories
+      }
+
+    , SlideData
+      { fileName: "donation.rb"
+      , filePath: "spec/factories"
+      , lineNumber: 1
+      , annotation: "So I simplified it to this and kept just the basic ones. I then set the fields I needed in the respective tests. This made my tests easier to follow but made some of them longer. I am willing to accept this tradeoff for now."
+      , content: newFactory
+      }
+
+    , SlideData
+      { fileName: ""
+      , filePath: ""
+      , lineNumber: 1
+      , annotation: "I hope you have enjoyed this walkthrough of a refactoring I have done. Feel free to checkout my github (https://github.com/frasermince) and look at the other projects I have done. You might be interested in some of the work I've done in Haskell (https://github.com/frasermince/mal-personal, https://github.com/frasermince/PortfolioAPI) or Javascript (https://github.com/frasermince/CodePortfolio, https://github.com/frasermince/MultiplyMe)"
+      , content: "\n"
+      }
+
+    , SlideData
+      { fileName: ""
+      , filePath: ""
+      , lineNumber: 1
+      , annotation: "And finally I hope you have enjoyed trying out my newest product. This code portfolio software. If you're interested in learning more about it or making presentations like this yourself shoot me an email at frasermince@gmail.com."
+      , content: "\n"
       }
 ]
