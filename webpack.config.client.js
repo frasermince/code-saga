@@ -3,22 +3,41 @@ const spawn = require('child_process').spawn
 const path = require('path')
 const webpack = require('webpack')
 const isProd = process.env.NODE_ENV === 'production'
+const CompressionPlugin = require("compression-webpack-plugin");
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
 const entries = [path.join(__dirname, 'support/client.entry.js')]
 
-const plugins = [
+var plugins = [
   new webpack.DefinePlugin({
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
   }),
+  // new CompressionPlugin({
+  //   asset: "[path].gz[query]",
+  //   algorithm: "gzip",
+  //   test: /\.(js|html)$/,
+  //   threshold: 10240,
+  //   minRatio: 0.8
+  // })
 ]
 
 if (isProd) {
-  plugins.push(
-    new webpack.LoaderOptionsPlugin({
-      minimize: true,
-      debug: false
+  plugins = plugins.concat([
+    // new webpack.LoaderOptionsPlugin({
+    //   minimize: true,
+    //   debug: false
+    // }),
+    new webpack.optimize.UglifyJsPlugin({
+      compress: {
+        warnings: false,
+        unused: true,
+        dead_code: true,
+      },
+      output: {
+        comments: false,
+      }
     })
-  )
+  ])
 } else {
   entries.unshift('webpack-hot-middleware/client?path=http://localhost:8080/__webpack_hmr&reload=true');
   plugins.push(
@@ -49,6 +68,10 @@ const config = {
           psc: 'psa',
           pscIde: true
         }
+      },
+      {
+        test: /\.(eot|svg|ttf|woff|woff2)$/,
+        loader: 'file?name=static/dist/[name].[ext]'
       }
     ],
   },
