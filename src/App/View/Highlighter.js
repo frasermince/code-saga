@@ -27,9 +27,9 @@ exports.highlightClass = createReactClass({
       codeTagProps: {style: {paddingTop: "10px", display: 'block', flexGrow: 100, minHeight: '100%' }},
       lineNumberContainerStyle: { textAlign: 'right',  padding: '10px', backgroundColor: '#fafafa', boxSizing: 'border-box', minHeight: '100%' },
       lineNumberStyle: { color: 'rgba(0,0,0,0.3)', fontSize: '12px', lineHeight: '19px', width: '38px', display: 'block', flex: 1 },
-      customStyle: { marginBottom: 0, marginLeft: 0, marginTop: 0, padding: 0, boxSizing: 'border-box', position: 'relative', overflowY: 'scroll', display: 'flex', alignItems: 'flex-start' },
+      customStyle: { marginBottom: 0, marginLeft: 0, marginTop: 0, padding: 0, boxSizing: 'border-box', position: 'relative', overflowY: 'scroll', display: 'flex', alignItems: 'flex-start', overflowX: 'scroll' },
       lineStyle: function (lineNumber) {
-        var style = { display: 'inline-block', paddingLeft: '10px', paddingRight: '10px', minWidth: '100%', minHeight: '19px', clear: 'both', float: 'left'};
+        var style = { display: 'inline-block', paddingLeft: '10px', minWidth: '99%', minHeight: '19px', clear: 'both', float: 'left'};
         if (lineNumber === highlightedLineNumber) {
           style.backgroundColor = '#fffbdd';
         }

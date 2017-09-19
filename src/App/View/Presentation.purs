@@ -12,7 +12,7 @@ import App.Events (Event(..))
 import CSS.TextAlign (leftTextAlign, textAlign)
 import Highlighter (codeField)
 import CSS (CSS, fromString, (?), fontSize, display, marginTop, marginRight, marginLeft, margin, px, key, backgroundColor, padding, borderRadius, grid, height, pct, border, solid, graytone, white, width, boxSizing, borderBox, flex, rgb, paddingLeft, borderColor, rgba, color, black, rem)
-import CSS.Overflow (overflow, scroll, overflowY)
+import CSS.Overflow (overflow, scroll, overflowY, overflowX, hidden)
 import CSS.Display (floatLeft, float, floatRight)
 import CSS.Geometry (lineHeight)
 import CSS.Border (borderBottom, border)
@@ -105,6 +105,7 @@ annotation = do
 file ∷ CSS
 file = do
   key (fromString "grid-row") "1 / 2"
+  overflow hidden
   container
 
 container ∷ CSS
