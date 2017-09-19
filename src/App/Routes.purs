@@ -37,5 +37,5 @@ match url = fromMaybe (NotFound url) $ router url $
 
 toURL :: Route -> String
 toURL (NotFound url) = url
-toURL (Home) = "/"
+toURL (Home) = "/presentation/multiply-me/1"
 toURL (Presentation projectName slideNumber) = "/presentation/" ⊕ projectName ⊕ "/" ⊕ show slideNumber
