@@ -27,8 +27,7 @@ view (SlideData s) = do
 
     div ! Att.style file ! className "file" $ do
       div ! Att.style header ! className "file-header" $ strong ! Att.style fileName $ text $ s.fileName
-      codeField {content: s.content, lineNumber: s.lineNumber} (text "")
-      -- pre $ code ! className "presentation-code" $ text s.content
+      codeField {content: s.content, lineNumber: s.lineNumber, language: s.language} (text "")
     div ! Att.style annotation ! className "annotation" $ do
       div ! Att.style contentHeader $ do
         button ! Att.style leftButton ! className "previous" #! onClick PreviousSlide $ text "Back"

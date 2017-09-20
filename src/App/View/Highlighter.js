@@ -24,7 +24,7 @@ exports.highlightClass = createReactClass({
     var highlightedLineNumber = this.props.lineNumber;
     return React.createElement(highlighter.default, {
       wrapLines: true,
-      language: 'ruby',
+      language: this.props.language,
       showLineNumbers: true,
       codeTagProps: {style: {paddingTop: "10px", display: 'block', flexGrow: 100, minHeight: '100%' }},
       lineNumberContainerStyle: { textAlign: 'right',  padding: '10px', backgroundColor: '#fafafa', boxSizing: 'border-box', minHeight: '100%' },
