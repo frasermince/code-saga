@@ -687,17 +687,7 @@ presentation =
       , lineNumber: 1
       , language: "haskell"
       , beforeOrAfter: Nothing
-      , annotation: "And finally I hope you have enjoyed trying out my newest product. This code portfolio software. If you're interested in learning more about it or making presentations like this yourself shoot me an email at frasermince@gmail.com."
-      , content: "\n"
-      }
-
-    , SlideData
-      { fileName: ""
-      , filePath: ""
-      , lineNumber: 1
-      , language: "haskell"
-      , beforeOrAfter: Nothing
-      , annotation: "And finally I hope you have enjoyed trying out my newest product. This code portfolio software. If you're interested in learning more about it or making presentations like this yourself shoot me an email at frasermince@gmail.com."
+      , annotation: "And finally I hope you have enjoyed trying out my newest product. This code portfolio software that I wrote in Purescript. If you're interested in learning more about it or making presentations like this yourself shoot me an email at frasermince@gmail.com."
       , content: "\n"
       }
 ]
