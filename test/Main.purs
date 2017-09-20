@@ -78,14 +78,6 @@ openSlide ∷ ∀ e. Int → ConcreteFeature e Unit
 openSlide number = get $ "http://localhost:3000/presentation/multiply-me/" ⊕ (show number)
 
 
-
-testSlides ∷ Array PreFetchSlide
-testSlides =
-  [
-    PreFetchSlide {filePath: "MultiplyMeApi/app/controllers/api/v1/", fileName: "leader_board_controller.rb", lineNumber: 1, annotation: "HI"}
-  , PreFetchSlide {filePath: "MultiplyMeApi/app/controllers/api/v1/", fileName: "donations_controller.rb", lineNumber: 1, annotation: "HI"}
-  , PreFetchSlide {filePath: "MultiplyMeApi/app/controllers/api/v1/", fileName: "organizations_controller.rb", lineNumber: 1, annotation: "HI"}
-  ]
 -- main ∷ Eff (TestEffects) Unit
 main = do
   void $ runAff errHandler (const $ Process.exit 0) do
