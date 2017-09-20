@@ -1,8 +1,8 @@
-module App.TestPresentation where
+module App.Presentations.Test where
 
 import Prelude
 import App.Prelude
-import App.State (SlideData(..))
+import App.State (SlideData(..), BeforeOrAfter(..))
 
 presentation ∷ Array SlideData
 presentation =
@@ -11,6 +11,8 @@ presentation =
       { fileName: "leader_board_controller.rb"
       , filePath: "MultiplyMeApi/app/controllers/api/v1/"
       , lineNumber: 8
+      , language: "ruby"
+      , beforeOrAfter: Nothing
       , annotation: "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec hendrerit tempor tellus. Donec pretium posuere tellus. Proin quam nisl, tincidunt et, mattis eget, convallis nec, purus. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nulla posuere. Donec vitae dolor. Nullam tristique diam non turpis. Cras placerat accumsan nulla. Nullam rutrum. Nam vestibulum accumsan nisl.orem ipsum dolor sit amet, consectetuer adipiscing elit. Donec hendrerit tempor tellus. Donec pretium posuere tellus. Proin quam nisl, tincidunt et, mattis eget, convallis nec, purus. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nulla posuere. Donec vitae dolor. Nullam tristique diam non turpis. Cras placerat accumsan nulla. Nullam rutrum. Nam vestibulum accumsan nisl.orem ipsum dolor sit amet, consectetuer adipiscing elit. Donec hendrerit tempor tellus. Donec pretium posuere tellus. Proin quam nisl, tincidunt et, mattis eget, convallis nec, purus. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nulla posuere. Donec vitae dolor. Nullam tristique diam non turpis. Cras placerat accumsan nulla. Nullam rutrum. Nam vestibulum accumsan nisl.orem ipsum dolor sit amet, consectetuer adipiscing elit. Donec hendrerit tempor tellus. Donec pretium posuere tellus. Proin quam nisl, tincidunt et, mattis eget, convallis nec, purus. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nulla posuere. Donec vitae dolor. Nullam tristique diam non turpis. Cras placerat accumsan nulla. Nullam rutrum. Nam vestibulum accumsan nisl.orem ipsum dolor sit amet, consectetuer adipiscing elit. Donec hendrerit tempor tellus. Donec pretium posuere tellus. Proin quam nisl, tincidunt et, mattis eget, convallis nec, purus. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nulla posuere. Donec vitae dolor. Nullam tristique diam non turpis. Cras placerat accumsan nulla. Nullam rutrum. Nam vestibulum accumsan nisl.orem ipsum dolor sit amet, consectetuer adipiscing elit. Donec hendrerit tempor tellus. Donec pretium posuere tellus. Proin quam nisl, tincidunt et, mattis eget, convallis nec, purus. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nulla posuere. Donec vitae dolor. Nullam tristique diam non turpis. Cras placerat accumsan nulla. Nullam rutrum. Nam vestibulum accumsan nisl."
       , content: "\
 \module Api\n\
@@ -42,6 +44,8 @@ presentation =
       { fileName: "referral_code_service.rb"
       , filePath: "MultiplyMeApi/app/services/"
       , lineNumber: 18
+      , language: "ruby"
+      , beforeOrAfter: Nothing
       , annotation: "second annotation"
       , content: "\
 \class ReferralCodeService\n\
@@ -75,6 +79,8 @@ presentation =
       { fileName: "organizations_controller.rb"
       , filePath: "MultiplyMeApi/app/controllers/api/v1/"
       , lineNumber: 1
+      , language: "ruby"
+      , beforeOrAfter: Nothing
       , annotation: "third annotation"
       , content: "\
 \module Api\n\

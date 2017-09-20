@@ -1,10 +1,12 @@
 var styles = require('react-syntax-highlighter/dist/styles/');
 var highlighter = require('react-syntax-highlighter/dist/light');
 var ruby = require('react-syntax-highlighter/dist/languages/ruby');
+var haskell = require('react-syntax-highlighter/dist/languages/haskell');
 var React = require('react');
 var createReactClass = require('create-react-class');
 
 highlighter.registerLanguage('ruby', ruby.default);
+highlighter.registerLanguage('haskell', haskell.default);
 exports.highlightClass = createReactClass({
   componentDidUpdate: function() {
     var pre = document.querySelector('pre'),

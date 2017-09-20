@@ -40,21 +40,6 @@ data Event = PageView Route
            | Navigate String DOMEvent
 
 -- foldp :: Event -> State -> EffModel State Event ClientEffects
-foldp (PageView Home) (State st) =
-  { state: State st { route = (Home), loaded = true }
-  , effects: [ do
-      liftEff do
-        case st.loaded of
-          true → changeHistory
-          false → pure $ Just $ PageView $ Presentation "multiply-me" 1
-    ]
-  }
-  where url = "/presentation/multiply-me/1"
-        changeHistory = do
-          h <- history =<< window
-          pushState (toForeign {}) (DocumentTitle "") (URL url) h
-          pure $ Just $ PageView $ Presentation "multiply-me" 1
-
 foldp (PageView route) (State st) = noEffects $ State st { route = route, loaded = true }
 
 foldp (PreviousSlide ev) (State st) =
@@ -90,7 +75,7 @@ navigateToSlideWith f (State st) event = createNavigate ∘ toURL <$> changeSlid
 
         changeSlideNumber ∷ Route → Maybe Route
         changeSlideNumber (Presentation projectName slideNumber)
-          | isJust $ findSlide (State st) $ f slideNumber = Just $ Presentation projectName $ f slideNumber
+          | isJust $ findSlide (State st) projectName $ f slideNumber = Just $ Presentation projectName $ f slideNumber
           | otherwise                                     = Nothing
 
         changeSlideNumber _ = Nothing

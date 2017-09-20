@@ -1,8 +1,8 @@
-module App.MultiplyMePresentation where
+module App.Presentations.MultiplyMe where
 
 import Prelude
 import App.Prelude
-import App.State (SlideData(..))
+import App.State (SlideData(..), BeforeOrAfter(..))
 
 newFactory ="\
 \FactoryGirl.define do\n\
@@ -870,6 +870,8 @@ presentation =
       { fileName: ""
       , filePath: ""
       , lineNumber: 1
+      , language: "ruby"
+      , beforeOrAfter: Nothing
       , annotation: "Hi! I want to walk you through a project of mine, the pieces that were broken windows, and how I fixed them. This project is the API from a startup I have been working on. This was one of the first projects I did using test driven development. I went back and refactored large pieces of it and I want to walk you through that process."
       , content: "\n"
 
@@ -878,6 +880,8 @@ presentation =
       { fileName: "pledgeable.rb"
       , filePath: "app/models/concerns"
       , lineNumber: 1
+      , language: "ruby"
+      , beforeOrAfter: Before
       , annotation: "There were several code smells and broken windows I wanted to address. The brunt of the logic involves creating donations and pledging. My original idea is, as you can see, not the best. I knew I didn't want fat models so I put all of my logic in this concern. It got big and unwieldy quickly. Not only was this a problem because a single file was doing a lot of unrelated things, but I also now knew to use composition over inheritance. So I wanted to refactor this into a bunch of small single responsibility plain ruby objects."
       , content: concern
       }
@@ -886,6 +890,8 @@ presentation =
       { fileName: "pledgeable.rb"
       , filePath: "app/models/concerns"
       , lineNumber: 21
+      , language: "ruby"
+      , beforeOrAfter: Before
       , annotation: "As you can see there is a semi complicated after_create hook that executes business logic. I learned through Thoughtbot Upcase videos and \"Ruby Science\" that this may not be the best idea. I decided to refactor this to move away from these smells."
       , content: concern
       }
@@ -894,6 +900,8 @@ presentation =
       { fileName: "donation_decorator.rb"
       , filePath: "app/decorators"
       , lineNumber: 1
+      , language: "ruby"
+      , beforeOrAfter: After
       , annotation: "To remove business logic from this after create hook I created this decorator that allows me to append actions after model creation. This make my program easier to test and makes it read much more clearly."
       , content: decorator
       }
@@ -902,6 +910,8 @@ presentation =
       { fileName: "donation_decorator.rb"
       , filePath: "app/decorators"
       , lineNumber: 29
+      , language: "ruby"
+      , beforeOrAfter: After
       , annotation: "Here is the main flow of the decorator. In retrospect I may have gone to far in abstracting out functions. However this still reads very clearly. Overall I am quite pleased with readability gained by using a decorator this way."
       , content: decorator
       }
@@ -910,6 +920,8 @@ presentation =
       { fileName: "donations_controller.rb"
       , filePath: "app/controllers/api/v1"
       , lineNumber: 5
+      , language: "ruby"
+      , beforeOrAfter: Before
       , annotation: "Also my controller was quite complicated before I created this decorator. I not only moved after_create logic into this class but much of this controller logic."
       , content: oldDonationController
       }
@@ -918,6 +930,8 @@ presentation =
       { fileName: "donations_controller.rb"
       , filePath: "app/controllers/api/v1"
       , lineNumber: 5
+      , language: "ruby"
+      , beforeOrAfter: After
       , annotation: "The create method on the controller is now much neater and all the messy logic is handled in the decorator"
       , content: newDonationController
       }
@@ -926,6 +940,8 @@ presentation =
       { fileName: "pledgeable.rb"
       , filePath: "app/models/concerns"
       , lineNumber: 73
+      , language: "ruby"
+      , beforeOrAfter: Before
       , annotation: "The donations are handled in Stripe and the logic originally also lived in the same concern. Once again this is quite messy and doesn't really belong here."
       , content: concern
       }
@@ -934,6 +950,8 @@ presentation =
       { fileName: "stripe_client.rb"
       , filePath: "app/models"
       , lineNumber: 1
+      , language: "ruby"
+      , beforeOrAfter: After
       , annotation: "I abstracted the Stripe logic out to it's own separate class. This way all the Stripe logic is in one file and thus this is the only place we make external calls to Stripe. One concern with this approach is feature envy. Several of the methods in here use their parameters more than the class itself. However I decided the simplicity was worth code smell."
       , content: stripe
       }
@@ -942,6 +960,8 @@ presentation =
       { fileName: "pledgeable.rb"
       , filePath: "app/models/concerns"
       , lineNumber: 69
+      , language: "ruby"
+      , beforeOrAfter: Before
       , annotation: "We had a gamified donation system and with that a challenge that must be passed before you can donate. It's in the same concern as everything else was! It's very clear at this point that this concern is nowhere near following the single responsibility principle."
       , content: concern
       }
@@ -950,6 +970,8 @@ presentation =
       { fileName: "completed_challenge_policy"
       , filePath: "app/policies"
       , lineNumber: 1
+      , language: "ruby"
+      , beforeOrAfter: After
       , annotation: "This seemed like the perfect use case for a policy object. Now it is a class with a single job!"
       , content: policy
       }
@@ -958,6 +980,8 @@ presentation =
       { fileName: "pledgeable.rb"
       , filePath: "app/models/concerns"
       , lineNumber: 21
+      , language: "ruby"
+      , beforeOrAfter: Before
       , annotation: "The policy is just one piece of determining if a charge should be made. When a donation is created there are several things that can happen. In this after create either the created donation, the referrer donation, or both could be charged."
       , content: concern
       }
@@ -966,6 +990,8 @@ presentation =
       { fileName: "pledgeable.rb"
       , filePath: "app/models/concerns"
       , lineNumber: 106
+      , language: "ruby"
+      , beforeOrAfter: Before
       , annotation: "We also had to see if the donation was a one time payment or a subscription."
       , content: concern
       }
@@ -974,6 +1000,8 @@ presentation =
       { fileName: "payment_factory.rb"
       , filePath: "app/models/payments"
       , lineNumber: 1
+      , language: "ruby"
+      , beforeOrAfter: After
       , annotation: "I decided to move this logic into a factory that would build a payment service."
       , content: factory
       }
@@ -982,6 +1010,8 @@ presentation =
       { fileName: "payment_factory.rb"
       , filePath: "app/models/payments"
       , lineNumber: 23
+      , language: "ruby"
+      , beforeOrAfter: After
       , annotation: "This factory knows which donations to charge and checks on both the parent and the child."
       , content: factory
       }
@@ -990,6 +1020,8 @@ presentation =
       { fileName: "payment_factory.rb"
       , filePath: "app/models/payments"
       , lineNumber: 43
+      , language: "ruby"
+      , beforeOrAfter: After
       , annotation: "It also determines if it should be a OneTimePayment or SubscriptionPayment strategy."
       , content: factory
       }
@@ -998,6 +1030,8 @@ presentation =
       { fileName: "one_time_payment.rb"
       , filePath: "app/models/payments"
       , lineNumber: 1
+      , language: "ruby"
+      , beforeOrAfter: After
       , annotation: "This is an example of one of the strategies built by the payment_factory. All payment strategies implement a pay method that charge Stripe in various ways."
       , content: strategy
       }
@@ -1006,6 +1040,8 @@ presentation =
       { fileName: "payment_service.rb"
       , filePath: "app/services"
       , lineNumber: 1
+      , language: "ruby"
+      , beforeOrAfter: After
       , annotation: "This is the service built by the factory we just saw. It is very simple and just calls pay on the strategies created by the factory."
       , content: paymentService
       }
@@ -1014,6 +1050,8 @@ presentation =
       { fileName: "organization.rb"
       , filePath: "app/models"
       , lineNumber: 25
+      , language: "ruby"
+      , beforeOrAfter: Before
       , annotation: "There is a lot of logic in here dealing with finding the correct user for a purchase. This is not great because it is a case of feature envy. Several of these methods are more interested in their parameters and OrganizationUser than they are in the class they are in. I did two different things to fix this problem."
       , content: orgModel
       }
@@ -1022,6 +1060,8 @@ presentation =
       { fileName: "organizations_user.rb"
       , filePath: "app/models"
       , lineNumber: 16
+      , language: "ruby"
+      , beforeOrAfter: After
       , annotation: "First I moved several of these methods to OrganizationUser to fix the feature envy. I then refactored them to just call the previously mentioned StripeClient. This made the logic much simpler and helped me not repeat myself."
       , content: joinModel
       }
@@ -1030,6 +1070,8 @@ presentation =
       { fileName: "stripe_client_spec.rb"
       , filePath: "spec/models"
       , lineNumber: 31
+      , language: "ruby"
+      , beforeOrAfter: After
       , annotation: "I also wanted an easy way to speed up tests while still keeping the original behavior. Especially with code that was calling out to Stripe. I decided to use VCR to record the result of the call the first time and after that just use those recordings. Here is an example of me using VCR."
       , content: test
       }
@@ -1038,6 +1080,8 @@ presentation =
       { fileName: "donation.rb"
       , filePath: "spec/factories"
       , lineNumber: 1
+      , language: "ruby"
+      , beforeOrAfter: Before
       , annotation: "I also had a lot of donation factories originally. I decided this constituted a mystery guest."
       , content: factories
       }
@@ -1046,6 +1090,8 @@ presentation =
       { fileName: "donation.rb"
       , filePath: "spec/factories"
       , lineNumber: 1
+      , language: "ruby"
+      , beforeOrAfter: After
       , annotation: "So I simplified it to this and kept just the basic ones. I then set the fields I needed in the respective tests. This made my tests easier to follow but made some of them longer. I am willing to accept this tradeoff for now."
       , content: newFactory
       }
@@ -1054,6 +1100,8 @@ presentation =
       { fileName: ""
       , filePath: ""
       , lineNumber: 1
+      , language: "ruby"
+      , beforeOrAfter: Nothing
       , annotation: "I hope you have enjoyed this walkthrough of a refactoring I have done. Feel free to checkout my github (https://github.com/frasermince) and look at the other projects I have done. You might be interested in some of the work I've done in Haskell (https://github.com/frasermince/mal-personal, https://github.com/frasermince/PortfolioAPI) or Javascript (https://github.com/frasermince/CodePortfolio, https://github.com/frasermince/MultiplyMe)"
       , content: "\n"
       }
@@ -1062,6 +1110,8 @@ presentation =
       { fileName: ""
       , filePath: ""
       , lineNumber: 1
+      , language: "ruby"
+      , beforeOrAfter: Nothing
       , annotation: "And finally I hope you have enjoyed trying out my newest product. This code portfolio software. If you're interested in learning more about it or making presentations like this yourself shoot me an email at frasermince@gmail.com."
       , content: "\n"
       }

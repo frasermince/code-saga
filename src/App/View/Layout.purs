@@ -27,9 +27,9 @@ view (State st) = do
   div ! className "app" $ do
     case st.route of
       (Home) -> Homepage.view (State st)
-      (Presentation name number) -> goToPresentation number
+      (Presentation name number) -> goToPresentation name number
       (NotFound url) -> notFound
-  where goToPresentation number = maybe notFound (Presentation.view) (findSlide (State st) number)
+  where goToPresentation name number = maybe notFound (Presentation.view) (findSlide (State st) name number)
         notFound = NotFound.view (State st)
 
 

@@ -29,8 +29,8 @@ import Text.Chalky (green, red, yellow)
 import Data.Time.Duration (Milliseconds(..))
 import Test.Interaction (expectChangeOnClick, expectNoChangeOnClick, clickElement, expectToEqual, getElementText, expectTextToEqual, getElementTextByXPath)
 import Server as Server
-import App.TestPresentation (presentation)
-import App.State (SlideData(..), PreFetchSlide(..))
+import App.Presentations.Test as Test
+import App.State (SlideData(..), PreFetchSlide(..), Presentations(..))
 
 
 codeSelector =  "//div[@class=\"presentation\"]//code[2]"
@@ -62,7 +62,7 @@ tests = do
     expectElementNotPresent "next"
 
   testScenarioWithOpen (openSlide 1) closeSite "The correct slide should show the code from the file associated with it and the annotation" [] do
-    foldl compareSlide (pure unit) presentation
+    foldl compareSlide (pure unit) Test.presentation
 
 compareSlide ∷ ∀ e. ConcreteFeature e Unit → SlideData → ConcreteFeature e Unit
 compareSlide accum (SlideData s) = accum
@@ -75,7 +75,7 @@ compareSlide accum (SlideData s) = accum
           expectTextToEqual getElementTextByXPath codeSelector text
 
 openSlide ∷ ∀ e. Int → ConcreteFeature e Unit
-openSlide number = get $ "http://localhost:3000/presentation/project_name/" ⊕ (show number)
+openSlide number = get $ "http://localhost:3000/presentation/multiply-me/" ⊕ (show number)
 
 
 
@@ -90,7 +90,8 @@ testSlides =
 main = do
   void $ runAff errHandler (const $ Process.exit 0) do
     log $ yellow "Starting tests"
-    _ ← liftEff' $ Server.testMain presentation
+    let presentation = Presentations {multiplyMe: Test.presentation, mal: []}
+    _ ← liftEff' $ Server.testMain $ Just presentation
     testResults ← attempt $ runTests $ {selenium: {waitTime: Milliseconds(60.0)}}
     case testResults of
       Left e → throwError e

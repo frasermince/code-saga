@@ -1,13 +1,16 @@
 module Server where
 
 import Prelude
+import Data.Tuple (Tuple(..))
 import App.Prelude
 import App.Events (Event(..), foldp)
 import App.Effects (AppEffects)
 import App.Routes (Route(..), match)
-import App.State (State(..),  initWithSlides, SlideData(..), transform)
-import App.MultiplyMePresentation (presentation)
+import App.State (State(..),  initWithSlides, SlideData(..), transform, Presentations(..))
+import App.Presentations.MultiplyMe as MultiplyMe
+import App.Presentations.Mal as Mal
 import App.View.HTMLWrapper (htmlWrapper)
+import Data.Array as List
 import App.View.Layout (view)
 import Control.IxMonad (ibind)
 import Control.Monad.Aff.Class (liftAff, class MonadAff)
@@ -17,7 +20,7 @@ import Control.Monad.Eff.Console (CONSOLE)
 import Data.String (length)
 import Data.Int (fromString)
 import Data.Foreign.Generic (defaultOptions, genericEncodeJSON)
-import Data.Maybe (fromMaybe)
+import Data.Maybe (fromMaybe, Maybe(..))
 import Data.Newtype (un, unwrap)
 import Hyper.Node.Server (runServer, defaultOptionsWithLogging)
 import Hyper.Port (Port(Port))
@@ -25,7 +28,7 @@ import Hyper.Conn (Conn)
 import Hyper.Middleware (Middleware, lift')
 import Hyper.Node.FileServer (fileServer)
 import Hyper.Request (class Request, getRequestData)
-import Hyper.Response (class Response, class ResponseWritable, ResponseEnded, StatusLineOpen, closeHeaders, respond, writeStatus)
+import Hyper.Response (class Response, class ResponseWritable, ResponseEnded, StatusLineOpen, closeHeaders, respond, writeStatus, writeHeader)
 import Hyper.Status (statusNotFound, statusOK)
 import Node.Buffer (BUFFER)
 import Node.FS (FS)
@@ -44,16 +47,17 @@ appHandler
   => Request req m
   => Response res m b
   => ResponseWritable b m String
-  => Array SlideData →
+  => Maybe Presentations →
      Middleware
      m
      (Conn req (res StatusLineOpen) c)
      (Conn req (res ResponseEnded) c)
      Unit
-appHandler slides = do
+appHandler presentations = do
   request ← getRequestData
 
-  let prefetch = if (null slides) then presentation else slides
+  let defaultPres = Presentations {multiplyMe: MultiplyMe.presentation, mal: Mal.presentation}
+  let prefetch = fromMaybe defaultPres presentations
   -- slideContents ← lift' $ liftEff $ transform prefetch
 
   -- slideContents ← liftEff $ _.slides $ unwrap $ state
@@ -85,9 +89,9 @@ appHandler slides = do
 
 -- | Starts server (for development).
 main :: Eff (CoreEffects (AppEffects (buffer :: BUFFER, fs :: FS, http :: HTTP, console :: CONSOLE, process :: PROCESS))) Unit
-main = testMain []
-testMain :: ∀ e. Array SlideData → Eff (CoreEffects (AppEffects (buffer :: BUFFER, fs :: FS, http :: HTTP, console :: CONSOLE, process :: PROCESS | e))) Unit
-testMain slides = do
+main = testMain Nothing
+testMain :: ∀ e. Maybe Presentations → Eff (CoreEffects (AppEffects (buffer :: BUFFER, fs :: FS, http :: HTTP, console :: CONSOLE, process :: PROCESS | e))) Unit
+testMain p = do
   port <- (fromMaybe 0 <<< fromString <<< fromMaybe "3000") <$> lookupEnv "PORT"
-  let app = fileServer "static" $ appHandler slides
+  let app = fileServer "static" $ appHandler p
   runServer (defaultOptionsWithLogging { port = Port port }) {} app

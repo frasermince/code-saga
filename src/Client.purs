@@ -1,9 +1,13 @@
 module Client where
 
-import App.Effects (AppEffects)
+import App.Prelude
+import Data.Show (show)
+import App.Effects (ClientEffects)
 import App.Events (Event(..), foldp)
+import Control.Monad.Eff.Console (log)
 import App.Routes (match)
-import App.State (State, initWithSlides)
+import Data.Foldable (foldl)
+import App.State (State, initWithSlides, emptyPres)
 import App.View.Layout (view)
 import Control.Applicative (pure)
 import Control.Bind ((=<<), discard, bind)
@@ -49,4 +53,4 @@ main url state = do
 
 -- | Used to serialize State from JSON in support/client.entry.js
 readState :: Foreign -> State
-readState json = either (\_ -> initWithSlides "/" []) id $ runExcept (genericDecode (defaultOptions { unwrapSingleConstructors = true }) json)
+readState json = either (\_ -> initWithSlides "/" emptyPres) id $ runExcept (genericDecode (defaultOptions { unwrapSingleConstructors = true }) json)
