@@ -387,7 +387,7 @@ presentation =
       , lineNumber: 1
       , language: "haskell"
       , beforeOrAfter: Nothing
-      , annotation: "Hello! I want to walk you through one of the first larger Haskell programs I've built. In this project I learned about concepts like monad transformers and started to experiment with what clean code should look like in pure functional programming. I did most of this work a couple of years ago but it remains a good example of a semi-larger Haskell application I have built."
+      , annotation: "Hello! I want to walk you through one of the first larger Haskell programs I built. In this project I learned about concepts like monad transformers and started to experiment with what clean code should look like in pure functional programming. I did most of this work a couple of years ago but it remains a good example of a semi-larger Haskell application I have built."
       , content: entry
       }
 
@@ -397,7 +397,7 @@ presentation =
       , lineNumber: 1
       , language: "haskell"
       , beforeOrAfter: Nothing
-      , annotation: "This project is a very simple implementation of Lisp in Haskell based upon the Make A Lisp project (https://github.com/kanaka/mal). There is an existing version of this project in Haskell but I tried to look at it as little as possible. My version is not quite finished yet, but I've learned so much about Haskell in making this I think it's worth showing off. So I will show you what I learned while building this and what I still have to do."
+      , annotation: "This project is a very simple implementation of Lisp in Haskell based upon the Make A Lisp project (https://github.com/kanaka/mal). There is an existing version of this project in Haskell but I tried to look at it as little as possible. My version is not quite finished yet, but I've learned so much about Haskell in making this I think it's worth showing off. So I will show you what I learned while building this and what it actually does."
       , content: entry
       }
 
@@ -417,7 +417,7 @@ presentation =
       , lineNumber: 19
       , language: "haskell"
       , beforeOrAfter: Nothing
-      , annotation: "This function does the brunt of the work. We call it with the Lisp command entered and the current environment."
+      , annotation: "This function does the brunt of the work. We pass in as parameters the Lisp command entered and the current environment."
       , content: entry
       }
 
@@ -467,7 +467,7 @@ presentation =
       , lineNumber: 34
       , language: "haskell"
       , beforeOrAfter: Nothing
-      , annotation: "An AppliedCommand is actually a function. So I'm just storing my MalFunctions as a partially applied function. Bindings and Environment are both lists of Sexps. They just represent the lists of names and values for function parameters."
+      , annotation: "An AppliedCommand is actually just a function. So I'm storing MalFunctions as partially applied functions. Bindings and Environment are both lists of Sexps. They are the lists of names and values for function parameters."
       , content: types
       }
 
@@ -507,7 +507,7 @@ presentation =
       , lineNumber: 61
       , language: "haskell"
       , beforeOrAfter: Nothing
-      , annotation: "In practice the environment that evaluate takes in is either the result of a previous computation or a default. This default is defined here. Here we define a bunch of basic functions and built the outer layer of the environment."
+      , annotation: "In practice the environment that evaluate takes in is either the result of a previous computation or this default. It consists of a bunch of basic functions and makes up the topmost layer of our environment."
       , content: core
       }
 
@@ -597,7 +597,7 @@ presentation =
       , lineNumber: 9
       , language: "haskell"
       , beforeOrAfter: Nothing
-      , annotation: "And here is the source of our evaluator function. It takes a tuple of a Sexp and a Env and returns an Eval. Before we dig into this function let's look at what an Eval actually is."
+      , annotation: "And here is the source of our evaluate function. It takes a tuple of a Sexp and a Env and returns an Eval. Before we dig into this function let's look at what an Eval actually is."
       , content: evaluator
       }
 
@@ -607,7 +607,7 @@ presentation =
       , lineNumber: 26
       , language: "haskell"
       , beforeOrAfter: Nothing
-      , annotation: "And here I started to realize one monad should not handle the effects I needed. At this point I learned how to use monad transformers. So I built myself a small stack of monads with the needed effects. I used WriterT to keep up with the environment and ExceptT to propegate errors through the result. The contained value is just another Sexp."
+      , annotation: "And here I started to realize one monad should not handle the effects I needed. At this point I learned how to use monad transformers. So I built myself a small stack of monads with the needed effects. I used WriterT to keep up with the environment and ExceptT to propagate errors through the result. The contained value is just another Sexp."
       , content: types
       }
 
@@ -627,7 +627,7 @@ presentation =
       , lineNumber: 57
       , language: "haskell"
       , beforeOrAfter: Nothing
-      , annotation: "The general case is defined here. We call a function named evalAst and either use the result to call the parameter as a function or throw an error."
+      , annotation: "The general case is defined here. We call a function named evalAst and either use the result to call the first parameter as a function or throw an error."
       , content: evaluator
       }
 
@@ -647,7 +647,7 @@ presentation =
       , lineNumber: 72
       , language: "haskell"
       , beforeOrAfter: Nothing
-      , annotation: "When it gets a list it recursively calls evaluate on the elements of that list."
+      , annotation: "When it receives a list it recursively calls evaluate on the elements of that list."
       , content: evaluator
       }
 
@@ -667,9 +667,20 @@ presentation =
       , lineNumber: 1
       , language: "haskell"
       , beforeOrAfter: Nothing
-      , annotation: "Just as a final note I wrote tests for the whole program and as much as possible tried to do test driven development. Here is one such file."
+      , annotation: "So that was the main flow of my program. Just as a final note I wrote tests for the whole program and as much as possible tried to do test driven development. Here is one such file."
       , content: parserTests
       }
+
+  , SlideData
+      { fileName: ""
+      , filePath: ""
+      , lineNumber: 1
+      , language: "haskell"
+      , beforeOrAfter: Nothing
+      , annotation: "There's still a lot to do. I haven't even added macros yet. Hopefully I'll have time to get back to it after I finish up my current projects!"
+      , content: "\n"
+      }
+
 
   , SlideData
       { fileName: ""
