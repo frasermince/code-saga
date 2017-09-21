@@ -4,7 +4,7 @@ const nodeExternals = require('webpack-node-externals')
 const isProd = process.env.NODE_ENV === 'production'
 
 const entries = [path.join(__dirname, 'support', 'server.entry.js')]
-const plugins = [
+var plugins = [
   new webpack.ProvidePlugin({
     'XMLHttpRequest': 'xhr2'
   }),
@@ -12,6 +12,24 @@ const plugins = [
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
   })
 ]
+if (isProd) {
+  plugins = plugins.concat([
+    // new webpack.LoaderOptionsPlugin({
+    //   minimize: true,
+    //   debug: false
+    // }),
+    new webpack.optimize.UglifyJsPlugin({
+      compress: {
+        warnings: false,
+        unused: true,
+        dead_code: true,
+      },
+      output: {
+        comments: false,
+      }
+    })
+  ])
+}
 
 module.exports = {
   entry: entries,
@@ -29,6 +47,10 @@ module.exports = {
         loader: 'purs-loader',
         exclude: /node_modules/,
         query: {}
+      },
+      {
+        test: /\.(eot|svg|ttf|woff|woff2)$/,
+        loader: 'file?name=static/dist/[name].[ext]'
       }
     ],
   },
