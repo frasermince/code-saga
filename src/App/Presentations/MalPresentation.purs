@@ -159,7 +159,8 @@ evaluator="\
 \\n\
 \                                                                            --add case statements for error handling\n\
 \evaluate (MalList (MalSymbol \"fn\" : MalList params : functionBody : []), env)\n\
-\  = return $ MalFunction $ createFunction params functionBody\n\
+\  = do tell env\n\
+\       return $ MalFunction $ createFunction params functionBody\n\
 \  where createFunction :: Command\n\
 \        createFunction params body bindings environment = evaluate (body, functionEnvironment params bindings environment)\n\
 \        functionEnvironment params bindings environment = foldl setToEnv environment $ zip params bindings\n\
