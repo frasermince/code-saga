@@ -28,8 +28,6 @@ import Signal ((~>))
 
 type WebApp = App (DOMEvent -> Event) Event State
 
-type ClientEffects = CoreEffects (AppEffects (history :: HISTORY, dom :: DOM))
-
 main ∷ String -> State -> Eff ClientEffects WebApp
 main url state = do
   -- | Create a signal of URL changes.
