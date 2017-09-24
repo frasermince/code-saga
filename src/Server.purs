@@ -23,7 +23,7 @@ import Data.Foreign.Generic (defaultOptions, genericEncodeJSON)
 import Data.Maybe (fromMaybe, Maybe(..))
 import Data.Newtype (un, unwrap)
 import Hyper.Node.Server (runServer, defaultOptionsWithLogging)
-import Hyper.Port (Port(Port))
+import Hyper.Node.Server.Options (Port(Port))
 import Hyper.Conn (Conn)
 import Hyper.Middleware (Middleware, lift')
 import Hyper.Node.FileServer (fileServer)
@@ -78,6 +78,7 @@ appHandler presentations = do
   _ <- writeStatus $ case ((un State state).route) of
         (NotFound _) -> statusNotFound
         _ -> statusOK
+  -- _ <- writeHeader (Tuple "Content-Encoding" "gzip")
   _ <- closeHeaders
 
   -- | Inject state JSON into HTML response.
@@ -93,5 +94,6 @@ main = testMain Nothing
 testMain :: ∀ e. Maybe Presentations → Eff (CoreEffects (AppEffects (buffer :: BUFFER, fs :: FS, http :: HTTP, console :: CONSOLE, process :: PROCESS | e))) Unit
 testMain p = do
   port <- (fromMaybe 0 <<< fromString <<< fromMaybe "3000") <$> lookupEnv "PORT"
-  let app = fileServer "static" $ appHandler p
+  let h = [ Tuple "Content-Encoding" "gzip" ]
+  let app = fileServer "static" (appHandler p) h
   runServer (defaultOptionsWithLogging { port = Port port }) {} app

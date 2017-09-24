@@ -23,10 +23,11 @@ htmlWrapper app_html state_json =
     head do
       meta ! charset "UTF-8"
       meta ! name "viewport" ! content "width=device-width, initial-scale=1"
+      -- meta ! name "viewport" ! content "width= 1281.590, user-scalable=no, maximum-scale=1"
       title $ text config.title
       link ! rel "icon" ! type' "image/x-icon" ! href "/favicon.ico"
     body do
       div ! dangerouslySetInnerHTML "<style>button{text-decoration: none; outline: none; cursor: pointer;}</style>" $ empty
       div ! key "app" ! id "app" ! dangerouslySetInnerHTML app_html $ empty
       script ! key "initial_state" ! type' "text/javascript" ! dangerouslySetInnerHTML state_json $ empty
-      script ! key "js_bundle" ! type' "text/javascript" ! src (config.public_path <> "/bundle.js") $ empty
+      script ! key "js_bundle" ! type' "text/javascript" ! src (config.public_path <> "/bundle.js.gz") $ empty

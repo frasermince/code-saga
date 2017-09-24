@@ -18,7 +18,7 @@
     "purescript-webdriver": "^4.0.1",
     "purescript-debug": "^3.0.0",
     "purescript-signal": "^9.0.0",
-    "purescript-hyper": "https://github.com/owickstrom/hyper.git#37-node-stream-limit",
+    "purescript-hyper": "https://github.com/frasermince/hyper.git#37-node-stream-limit",
     "purescript-stringutils": "^0.0.6"
   },
   "devDependencies": {
