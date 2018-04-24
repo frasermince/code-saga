@@ -64,10 +64,12 @@ const config = {
         exclude: /node_modules/,
         query: isProd ? {
           bundle: true,
-          bundleOutput: 'static/dist/bundle.js'
+          bundleOutput: 'static/dist/bundle.js',
+          pscPackage: true
         } : {
           psc: 'psa',
-          pscIde: true
+          pscIde: true,
+          pscPackage: true
         }
       },
       {
@@ -90,7 +92,7 @@ const config = {
     },
     modules: [
       'node_modules',
-      'bower_components'
+      '.psc-package'
     ],
     extensions: ['.js', '.purs']
   },

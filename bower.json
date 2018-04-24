@@ -19,9 +19,14 @@
     "purescript-debug": "^3.0.0",
     "purescript-signal": "^9.0.0",
     "purescript-hyper": "https://github.com/frasermince/hyper.git#37-node-stream-limit",
-    "purescript-stringutils": "^0.0.6"
+    "purescript-stringutils": "^0.0.6",
+    "purescript-smolder": "10.1.0"
   },
   "devDependencies": {
     "purescript-chalky": "^2.0.0"
+  },
+  "resolutions": {
+    "purescript-smolder": "10.1.0",
+    "purescript-arraybuffer-types": "^2.0.0"
   }
 }

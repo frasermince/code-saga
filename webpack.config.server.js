@@ -46,7 +46,9 @@ module.exports = {
         test: /\.purs$/,
         loader: 'purs-loader',
         exclude: /node_modules/,
-        query: {}
+        query: {
+            pscPackage: true
+        }
       },
       {
         test: /\.(eot|svg|ttf|woff|woff2)$/,
