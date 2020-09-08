@@ -9,7 +9,7 @@
     "story"
   ],
   "scripts": {
-    "postinstall": "bower cache clean && bower install",
+    "postinstall": "bower --allow-root cache clean && bower --allow-root install",
     "clean": "rimraf static/dist/ && rimraf dist/",
     "build": "npm run clean && webpack --config ./webpack.config.client.js --progress --profile --colors && webpack --config ./webpack.config.server.js --progress --profile --colors",
     "dev": "npm run clean && node ./webpack.config.client.js",

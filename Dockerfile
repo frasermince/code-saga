@@ -1,13 +1,15 @@
-FROM node:7.8.0
+FROM node:8.0.0
 
-RUN mkdir -p /app
-WORKDIR /app
+RUN mkdir -p /code
+WORKDIR /code
+ADD . /code
 
-COPY "node_modules/" "node_modules"
-COPY "static/" "static/"
-COPY "dist/" "dist"
+RUN npm install yarn && \
+    yarn && \
+    yarn run postinstall && \
+    yarn run build && \
+    yarn cache clean
 
-# RUN gzip static/dist/bundle.js
 
 ENV NODE_ENV production
 
