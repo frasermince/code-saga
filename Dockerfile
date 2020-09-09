@@ -4,13 +4,13 @@ RUN mkdir -p /code
 WORKDIR /code
 ADD . /code
 
-ENV NODE_ENV production
-
 RUN npm install yarn && \
     yarn && \
     yarn run postinstall && \
-    NODE_ENV=production yarn run build && \
+    yarn run build && \
     yarn cache clean
+
+ENV NODE_ENV production
 
 EXPOSE 3000
 
