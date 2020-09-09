@@ -9,7 +9,7 @@ ENV NODE_ENV production
 RUN npm install yarn && \
     yarn && \
     yarn run postinstall && \
-    yarn run build && \
+    NODE_ENV=production yarn run build && \
     yarn cache clean
 
 EXPOSE 3000
