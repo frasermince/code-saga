@@ -14,4 +14,4 @@ ENV NODE_ENV production
 
 EXPOSE 3000
 
-CMD NODE_ENV=production node ./dist/server.js
+CMD NODE_ENV=production node dist/server.js
